@@ -14,5 +14,7 @@
     <string name="searching_devices">Procurando Dispositivos&#8230;</string>
     <string name="waiting_player">Esperando o Adversário</string>
     <string name="waiting_invite">Esperando Convite</string>
+    <string name="title_activity_host_game">HostGameActivity</string>
+    <string name="title_activity_client_game">ClientGameActivity</string>
 
 </resources>

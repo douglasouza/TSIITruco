@@ -78,13 +78,12 @@ public class JoinGameActivity extends Activity {
 	}
 	
 	@Override
-	protected void onPause() 
+	protected void onDestroy() 
 	{
 		Log.i(getClass().getName(), "Unregistering receiver and canceling search");
 		unregisterReceiver(broadcastReceiver);
-		btDeviceList.clear();
 		btHelper.getBtAdapter().cancelDiscovery();
-		super.onPause();
+		super.onDestroy();
 	}
 	
 	private void btInit()
@@ -132,10 +131,13 @@ public class JoinGameActivity extends Activity {
 						super.onPostExecute(result);
 						if (result == true)
 						{
-							Toast.makeText(JoinGameActivity.this, BluetoothHelper.getBtSocket().getRemoteDevice().getName(), Toast.LENGTH_LONG).show();
+							btHelper.getBtAdapter().cancelDiscovery();
+							Intent clientGameIntent = new Intent(JoinGameActivity.this, ClientGameActivity.class);
+							startActivity(clientGameIntent);
 						}
 						else
 						{
+							btHelper.getBtAdapter().cancelDiscovery();
 							Toast.makeText(JoinGameActivity.this, "Falha na conexão, tente novamente!", Toast.LENGTH_LONG).show();
 							finish();
 						}

@@ -88,7 +88,9 @@ public class LobbyActivity extends Activity {
 						txtDeviceName.clearAnimation();
 						txtOpponentDeviceName.clearAnimation();
 						txtWaitingPlayer.clearAnimation();
-						Toast.makeText(LobbyActivity.this, BluetoothHelper.getBtSocket().getRemoteDevice().getName(), Toast.LENGTH_LONG).show();
+						
+						Intent hostGameIntent = new Intent(LobbyActivity.this, HostGameActivity.class);
+						startActivity(hostGameIntent);
 					}
 					else
 					{

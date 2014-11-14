@@ -14,6 +14,7 @@ public class BluetoothHelper {
 	
 	private static final int REQUEST_ENABLE_BT = 1;
 	private static final int REQUEST_DISCOVERABLE_BT = 1;
+	public static final String UUID_STRING = "a60f35f0-b93a-11de-8a39-08002009c666";
 	
 	private static BluetoothServerSocket btServerSocket;
 	private static BluetoothSocket btSocket;
@@ -27,7 +28,7 @@ public class BluetoothHelper {
 	{
 		this.activity = activity;
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
-		uuid = UUID.fromString("a60f35f0-b93a-11de-8a39-08002009c666");
+		uuid = UUID.fromString(UUID_STRING);
 	}
 	
 	public BluetoothAdapter getBtAdapter() 
