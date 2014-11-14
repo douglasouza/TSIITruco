@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Truco!</string>
+    <string name="create_game">Criar Jogo</string>
+    <string name="device_name">Nome do Bluetooth</string>
+    <string name="find_game">Encontrar Jogo</string>
+    <string name="initial_score">0 x 0</string>
+    <string name="title_activity_join_game">JoinGameActivity</string>
+    <string name="title_activity_lobby">LobbyActivity</string>
+    <string name="title_activity_truco">TrucoActivity</string>
+    <string name="your_device_name">O nome do seu dispositivo Bluetooth é:</string>
+    <string name="waiting">Aguardando&#8230;</string>
+    <string name="searching_devices">Procurando Dispositivos&#8230;</string>
+    <string name="waiting_player">Esperando o Adversário</string>
+    <string name="waiting_invite">Esperando Convite</string>
+
+</resources>
