@@ -1,0 +1,135 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:keepScreenOn="true" >
+
+    <ImageView
+        android:id="@+id/imageViewOpponentCard1"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewOpponentCard2"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/imageViewOpponentCard1"
+        android:layout_alignTop="@+id/imageViewOpponentCard1"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewOpponentCard3"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/imageViewOpponentCard2"
+        android:layout_alignTop="@+id/imageViewOpponentCard2"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewCard1"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/imageViewOpponentCard1"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="18dp"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewVira"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/imageViewOpponentPlayingCard"
+        android:layout_marginRight="20dp"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewCard2"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignTop="@+id/imageViewCard1"
+        android:layout_toRightOf="@+id/imageViewCard1"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewCard3"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignTop="@+id/imageViewCard2"
+        android:layout_toRightOf="@+id/imageViewCard2"
+        android:src="@drawable/decks_back" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageViewOpponentPlayingCard"
+        android:layout_alignRight="@+id/imageViewPlayingCard"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:text="VS"
+        android:textColor="@android:color/white"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/initial_score"
+        android:textColor="@android:color/white"
+        android:textSize="40sp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_alignRight="@+id/textView1"
+        android:layout_below="@+id/textView1"
+        android:gravity="center"
+        android:text="@string/initial_score"
+        android:textColor="@android:color/white"
+        android:textSize="32sp" />
+
+    <ImageView
+        android:id="@+id/imageViewPlayingCard"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/imageViewOpponentPlayingCard"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/decks_back" />
+
+    <ImageView
+        android:id="@+id/imageViewOpponentPlayingCard"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_toLeftOf="@+id/imageViewVira"
+        android:src="@drawable/decks_back" />
+
+    <Button
+        android:id="@+id/btnTruco"
+        style="@style/btnStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageViewVira"
+        android:layout_alignRight="@+id/imageViewVira"
+        android:layout_alignTop="@+id/imageViewCard3"
+        android:text="@string/app_name" />
+
+</RelativeLayout>
