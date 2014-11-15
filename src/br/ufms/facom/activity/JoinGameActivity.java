@@ -32,7 +32,6 @@ public class JoinGameActivity extends Activity {
 	private ArrayList<String> discoveryArrayList;
 	private ArrayAdapter<String> discoveryArrayAdapter;
 	private ArrayList<BluetoothDevice> btDeviceList;
-	private BluetoothHelper btHelper;
 	private BroadcastReceiver broadcastReceiver;
 	private TextView txtSearchingDevices;
 	private IntentFilter filter;
@@ -48,14 +47,10 @@ public class JoinGameActivity extends Activity {
 		btInit();
 		
 		setAnimation();
-	}
-	
-	@Override
-	protected void onResume() 
-	{
+		
 		Log.i(getClass().getName(), "Starting dicovery");
-		btHelper.enableBt();
-		btHelper.getBtAdapter().startDiscovery();
+		BluetoothHelper.enableBt();
+		BluetoothHelper.getBtAdapter().startDiscovery();
 		broadcastReceiver = new BroadcastReceiver() 
 		{
             public void onReceive(Context context, Intent intent) 
@@ -74,7 +69,12 @@ public class JoinGameActivity extends Activity {
         // Register the BroadcastReceiver
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(broadcastReceiver, filter);
-		super.onResume();
+	}
+	
+	@Override
+	protected void onRestart() {
+		finish();
+		super.onRestart();
 	}
 	
 	@Override
@@ -82,14 +82,12 @@ public class JoinGameActivity extends Activity {
 	{
 		Log.i(getClass().getName(), "Unregistering receiver and canceling search");
 		unregisterReceiver(broadcastReceiver);
-		btHelper.getBtAdapter().cancelDiscovery();
+		BluetoothHelper.getBtAdapter().cancelDiscovery();
 		super.onDestroy();
 	}
 	
 	private void btInit()
 	{
-		btHelper = new BluetoothHelper(JoinGameActivity.this);
-		
 		btDeviceList = new ArrayList<BluetoothDevice>();
 		
 		discoveryList = (ListView) findViewById(R.id.list);
@@ -131,13 +129,13 @@ public class JoinGameActivity extends Activity {
 						super.onPostExecute(result);
 						if (result == true)
 						{
-							btHelper.getBtAdapter().cancelDiscovery();
+							BluetoothHelper.getBtAdapter().cancelDiscovery();
 							Intent clientGameIntent = new Intent(JoinGameActivity.this, ClientGameActivity.class);
 							startActivity(clientGameIntent);
 						}
 						else
 						{
-							btHelper.getBtAdapter().cancelDiscovery();
+							BluetoothHelper.getBtAdapter().cancelDiscovery();
 							Toast.makeText(JoinGameActivity.this, "Falha na conexão, tente novamente!", Toast.LENGTH_LONG).show();
 							finish();
 						}

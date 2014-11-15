@@ -49,14 +49,8 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 		card1.setOnClickListener(this);
 		card2.setOnClickListener(this);
 		card3.setOnClickListener(this);
-		opponentCard1.setOnClickListener(this);
-		opponentCard2.setOnClickListener(this);
-		opponentCard3.setOnClickListener(this);
-		playingCard.setOnClickListener(this);
-		opponentPlayingCard.setOnClickListener(this);
-		vira.setOnClickListener(this);
 		
-		AsyncTask<Void, Void, byte[]> receiveCard = new AsyncTask<Void, Void, byte[]>() {
+		AsyncTask<Void, Void, byte[]> receiveInitialInfo = new AsyncTask<Void, Void, byte[]>() {
 			@Override
 			protected byte[] doInBackground(Void... params) {
 				byte[] buffer = new byte[1024];
@@ -79,12 +73,21 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 						Log.i(getClass().getName(), e.getMessage().toString());
 					}
 				}
-				Toast.makeText(ClientGameActivity.this, "NAO CHEGOU", Toast.LENGTH_LONG).show();
+				else
+				{
+					Toast.makeText(ClientGameActivity.this, "NAO CHEGOU", Toast.LENGTH_LONG).show();
+				}
 				super.onPostExecute(result);
 			}
 		};
 		
-		receiveCard.execute();
+		receiveInitialInfo.execute();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		BluetoothHelper.closeSocket();
+		super.onBackPressed();
 	}
 	
 	@Override

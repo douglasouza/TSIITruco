@@ -55,27 +55,43 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		card1.setOnClickListener(this);
 		card2.setOnClickListener(this);
 		card3.setOnClickListener(this);
-		opponentCard1.setOnClickListener(this);
-		opponentCard2.setOnClickListener(this);
-		opponentCard3.setOnClickListener(this);
-		playingCard.setOnClickListener(this);
-		opponentPlayingCard.setOnClickListener(this);
-		vira.setOnClickListener(this);
 		
 		manager = new TrucoManager();
 		turnPlayed = false;
 		card1Used = false;
 		card2Used = false;
 		card3Used = false;
+		
+		initCards();
+		
+		AsyncTask<Void, Void, Boolean> sendInitalInfo = new AsyncTask<Void, Void, Boolean>() {
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				String initialInfo = manager.playerTurn + ", " + manager.handPlayer2[0].fileName + ", " + manager.handPlayer2[1].fileName + ", " + manager.handPlayer2[2].fileName;
+				try {
+					BluetoothHelper.getBtSocket().getOutputStream().write(initialInfo.getBytes());
+				} catch (IOException e) {
+					Log.i(getClass().getName(), e.getMessage().toString());
+					return false;
+				}
+				return true;
+			}
+			
+			@Override
+			protected void onPostExecute(Boolean result) {
+				if (result == true)
+					Toast.makeText(HostGameActivity.this, "SUCESSO", Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(HostGameActivity.this, "DEU MERDA", Toast.LENGTH_LONG).show();
+				super.onPostExecute(result);
+			}
+		};
+		
+		sendInitalInfo.execute();
+		
 		Toast.makeText(this, Integer.toString(manager.playerTurn), Toast.LENGTH_LONG).show();
 	}
 	
-	@Override
-	protected void onResume() {
-		initCards();
-		super.onResume();
-	}
-
 	private void initCards() {
 		int resourceId;
 		
@@ -90,6 +106,12 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		
 		resourceId = getResources().getIdentifier(manager.vira.fileName, "drawable", getPackageName());
 		vira.setImageDrawable(getResources().getDrawable(resourceId));
+	}
+	
+	@Override
+	public void onBackPressed() {
+		BluetoothHelper.closeSocket();
+		super.onBackPressed();
 	}
 
 	@Override
@@ -109,9 +131,9 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					AsyncTask<Void, Void, Boolean> sendCard = new AsyncTask<Void, Void, Boolean>() {
 						@Override
 						protected Boolean doInBackground(Void... params) {
-							String tacalepau = "lalala";
+							String cardInfo = "lalala";
 							try {
-								BluetoothHelper.getBtSocket().getOutputStream().write(tacalepau.getBytes());
+								BluetoothHelper.getBtSocket().getOutputStream().write(cardInfo.getBytes());
 							} catch (IOException e) {
 								Log.i(getClass().getName(), e.getMessage().toString());
 								return false;

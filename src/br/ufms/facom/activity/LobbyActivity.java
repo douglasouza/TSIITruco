@@ -19,7 +19,6 @@ import br.ufms.facom.truco.R;
 public class LobbyActivity extends Activity {
 
 	private Animation anim;
-	private BluetoothHelper btHelper;
 	private BluetoothServerSocket btServerSocket;
 	private TextView txtDeviceName;
 	private TextView txtOpponentDeviceName;
@@ -51,7 +50,7 @@ public class LobbyActivity extends Activity {
 		}
 		else
 		{
-			btServerSocket = btHelper.getBluetoothServerSocket();
+			btServerSocket = BluetoothHelper.getBluetoothServerSocket();
 			
 			AsyncTask<Void, Void, Boolean> listenTask = new AsyncTask<Void, Void, Boolean>()
 			{
@@ -106,6 +105,12 @@ public class LobbyActivity extends Activity {
 		}
 	}
 	
+	@Override
+	protected void onRestart() {
+		finish();
+		super.onRestart();
+	}
+	
 	private void init() 
 	{
 		txtDeviceName = (TextView) findViewById(R.id.txtDeviceName);
@@ -115,9 +120,7 @@ public class LobbyActivity extends Activity {
 
 	private void btInit() 
 	{
-		btHelper = new BluetoothHelper(LobbyActivity.this);
-		
-		if (btHelper.getBtAdapter() == null)
+		if (BluetoothHelper.getBtAdapter() == null)
         {
         	Toast.makeText(LobbyActivity.this, "O dispositivo não suporta conexões Bluetooth. Não será possível jogar!", Toast.LENGTH_LONG).show();
         	Log.i(getClass().getName(), "Device does not support Bluetooth");
@@ -126,8 +129,8 @@ public class LobbyActivity extends Activity {
         else
         {
         	Log.i(getClass().getName(), "Device supports Bluetooth");
-        	btHelper.makeItVisible();
-        	txtDeviceName.setText(btHelper.getBtAdapter().getName().toString());
+        	BluetoothHelper.makeItVisible();
+        	txtDeviceName.setText(BluetoothHelper.getBtAdapter().getName().toString());
         }
 	}
 	
