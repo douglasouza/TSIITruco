@@ -6,14 +6,14 @@ public class Card
 	
 	public CardValue cardValue;
 	
-	String fileName;
+	public String fileName;
 	
 	public Card(Suit suit, CardValue cardValue)
 	{
 		this.suit = suit;
 		this.cardValue = cardValue;
 		
-		fileName = cardValue.toString() + "_of_" + suit.toString() + ".png";
+		fileName = cardValue.toString() + "_of_" + suit.toString();
 	}
 	
 }

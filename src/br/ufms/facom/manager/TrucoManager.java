@@ -1,22 +1,26 @@
 package br.ufms.facom.manager;
 
+import java.util.Random;
+
 public class TrucoManager {
 	
-	protected Deck deck;
-	protected Card vira;
-	protected int manilha;
+	public Deck deck;
+	public Card vira;
+	public int manilha;
 	
-	protected int scorePlayer1;
-	protected int scorePlayer2;
+	public int scorePlayer1;
+	public int scorePlayer2;
 	
-	protected int bonus;
+	public int bonus;
 	
-	protected Card [] handPlayer1;
-	protected Card [] handPlayer2;
+	public int playerTurn;
 	
-	protected Boolean [] usedCardPlayer1;
+	public Card [] handPlayer1;
+	public Card [] handPlayer2;
 	
-	protected Boolean [] usedCardPlayer2;
+	public Boolean [] usedCardPlayer1;
+	
+	public Boolean [] usedCardPlayer2;
 	
 	
 	public TrucoManager()
@@ -58,6 +62,10 @@ public class TrucoManager {
 		{
 			manilha = (vira.cardValue.ordinal())+ 1;
 		}
+		
+		Random rand = new Random();
+		
+		playerTurn = rand.nextInt(2);
 	}
 	
 	public void returnCards()
