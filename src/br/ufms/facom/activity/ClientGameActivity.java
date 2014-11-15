@@ -68,6 +68,9 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				if (result != null)
 				{
 					try {
+						String temp = new String(result, "UTF-8");
+						String[] names = temp.split(",");
+						initCards(names[0], names[1], names[2], names[3]);
 						Toast.makeText(ClientGameActivity.this, new String(result, "UTF-8"), Toast.LENGTH_LONG).show();
 					} catch (UnsupportedEncodingException e) {
 						Log.i(getClass().getName(), e.getMessage().toString());
@@ -82,6 +85,22 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 		};
 		
 		receiveInitialInfo.execute();
+	}
+	
+	private void initCards(String card1Name, String card2Name, String card3Name, String viraName) {
+		int resourceId;
+		
+		resourceId = getResources().getIdentifier(card1Name, "drawable", getPackageName());
+		card1.setImageDrawable(getResources().getDrawable(resourceId));
+		
+		resourceId = getResources().getIdentifier(card2Name, "drawable", getPackageName());
+		card2.setImageDrawable(getResources().getDrawable(resourceId));
+		
+		resourceId = getResources().getIdentifier(card3Name, "drawable", getPackageName());
+		card3.setImageDrawable(getResources().getDrawable(resourceId));
+		
+		resourceId = getResources().getIdentifier(viraName, "drawable", getPackageName());
+		vira.setImageDrawable(getResources().getDrawable(resourceId));
 	}
 	
 	@Override
