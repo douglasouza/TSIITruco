@@ -17,7 +17,7 @@ public class BluetoothHelper {
 	
 	private static BluetoothServerSocket btServerSocket;
 	private static BluetoothSocket btSocket;
-	private static UUID uuid;
+	private static UUID uuid = UUID.fromString(UUID_STRING);
 	
 	private static BluetoothAdapter btAdapter;
 	
@@ -26,13 +26,11 @@ public class BluetoothHelper {
 	public BluetoothHelper(Activity act)
 	{
 		activity = act;
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
-		uuid = UUID.fromString(UUID_STRING);
 	}
 	
 	public static BluetoothAdapter getBtAdapter() 
 	{
-		return btAdapter;
+		return btAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
 	
 	public static BluetoothServerSocket getBluetoothServerSocket()
@@ -63,7 +61,7 @@ public class BluetoothHelper {
 		return uuid;
 	}
 
-	public static void enableBt()
+	public void enableBt()
 	{
 		if (!btAdapter.isEnabled())
         {
@@ -72,7 +70,7 @@ public class BluetoothHelper {
         }
 	}
 	
-	public static void makeItVisible()
+	public void makeItVisible()
 	{
 		 Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 	     discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);

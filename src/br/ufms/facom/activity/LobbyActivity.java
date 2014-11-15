@@ -19,6 +19,7 @@ import br.ufms.facom.truco.R;
 public class LobbyActivity extends Activity {
 
 	private Animation anim;
+	private BluetoothHelper btHelper;
 	private BluetoothServerSocket btServerSocket;
 	private TextView txtDeviceName;
 	private TextView txtOpponentDeviceName;
@@ -120,6 +121,8 @@ public class LobbyActivity extends Activity {
 
 	private void btInit() 
 	{
+		btHelper = new BluetoothHelper(LobbyActivity.this);
+		
 		if (BluetoothHelper.getBtAdapter() == null)
         {
         	Toast.makeText(LobbyActivity.this, "O dispositivo não suporta conexões Bluetooth. Não será possível jogar!", Toast.LENGTH_LONG).show();
@@ -129,7 +132,7 @@ public class LobbyActivity extends Activity {
         else
         {
         	Log.i(getClass().getName(), "Device supports Bluetooth");
-        	BluetoothHelper.makeItVisible();
+        	btHelper.makeItVisible();
         	txtDeviceName.setText(BluetoothHelper.getBtAdapter().getName().toString());
         }
 	}

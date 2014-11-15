@@ -32,6 +32,7 @@ public class JoinGameActivity extends Activity {
 	private ArrayList<String> discoveryArrayList;
 	private ArrayAdapter<String> discoveryArrayAdapter;
 	private ArrayList<BluetoothDevice> btDeviceList;
+	private BluetoothHelper btHelper;
 	private BroadcastReceiver broadcastReceiver;
 	private TextView txtSearchingDevices;
 	private IntentFilter filter;
@@ -49,7 +50,7 @@ public class JoinGameActivity extends Activity {
 		setAnimation();
 		
 		Log.i(getClass().getName(), "Starting dicovery");
-		BluetoothHelper.enableBt();
+		btHelper.enableBt();
 		BluetoothHelper.getBtAdapter().startDiscovery();
 		broadcastReceiver = new BroadcastReceiver() 
 		{
@@ -88,6 +89,8 @@ public class JoinGameActivity extends Activity {
 	
 	private void btInit()
 	{
+		btHelper = new BluetoothHelper(JoinGameActivity.this);
+		
 		btDeviceList = new ArrayList<BluetoothDevice>();
 		
 		discoveryList = (ListView) findViewById(R.id.list);
