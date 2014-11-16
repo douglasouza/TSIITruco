@@ -70,7 +70,12 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					try {
 						String temp = new String(result, "UTF-8");
 						String[] names = temp.split(",");
-						initCards(names[0], names[1], names[2], names[3]);
+						Log.i("CARTINHA", names[0]);
+						Log.i("CARTINHA", names[1]);
+						Log.i("CARTINHA", names[2]);
+						Log.i("CARTINHA", names[3]);
+						Log.i("CARTINHA", names[4]);
+						initCards(names[1], names[2], names[3], names[4]);
 						Toast.makeText(ClientGameActivity.this, new String(result, "UTF-8"), Toast.LENGTH_LONG).show();
 					} catch (UnsupportedEncodingException e) {
 						Log.i(getClass().getName(), e.getMessage().toString());

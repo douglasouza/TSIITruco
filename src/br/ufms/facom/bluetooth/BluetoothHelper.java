@@ -26,11 +26,12 @@ public class BluetoothHelper {
 	public BluetoothHelper(Activity act)
 	{
 		activity = act;
+		btAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
 	
 	public static BluetoothAdapter getBtAdapter() 
 	{
-		return btAdapter = BluetoothAdapter.getDefaultAdapter();
+		return btAdapter;
 	}
 	
 	public static BluetoothServerSocket getBluetoothServerSocket()

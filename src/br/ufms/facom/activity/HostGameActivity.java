@@ -67,7 +67,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		AsyncTask<Void, Void, Boolean> sendInitalInfo = new AsyncTask<Void, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(Void... params) {
-				String initialInfo = manager.playerTurn + "," + manager.handPlayer2[0].fileName + "," + manager.handPlayer2[1].fileName + "," + manager.handPlayer2[2].fileName + "," + manager.vira.fileName;
+				String initialInfo = manager.playerTurn + "," + manager.handPlayer2[0].fileName + "," + manager.handPlayer2[1].fileName + "," + manager.handPlayer2[2].fileName + "," + manager.vira.fileName + ",";
 				try {
 					BluetoothHelper.getBtSocket().getOutputStream().write(initialInfo.getBytes());
 				} catch (IOException e) {
