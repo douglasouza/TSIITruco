@@ -110,7 +110,8 @@
         android:layout_alignLeft="@+id/imageViewOpponentPlayingCard"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/decks_back" />
+        android:src="@drawable/decks_back"
+        android:visibility="invisible" />
 
     <ImageView
         android:id="@+id/imageViewOpponentPlayingCard"
@@ -120,7 +121,8 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
         android:layout_toLeftOf="@+id/imageViewVira"
-        android:src="@drawable/decks_back" />
+        android:src="@drawable/decks_back"
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/btnTruco"

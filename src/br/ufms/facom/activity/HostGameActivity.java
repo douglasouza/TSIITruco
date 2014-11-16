@@ -1,6 +1,8 @@
 package br.ufms.facom.activity;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -8,15 +10,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.Toast;
 import br.ufms.facom.bluetooth.BluetoothHelper;
 import br.ufms.facom.manager.TrucoManager;
+import br.ufms.facom.task.ReceiveCardInfoTask;
+import br.ufms.facom.task.SendCardInfoTask;
 import br.ufms.facom.truco.R;
 
 public class HostGameActivity extends Activity implements OnClickListener{
 	
-	//private AnimationSet animSet;
+	private Animation fadeIn;
+	private Animation fadeOut;
 	private ImageView card1;
 	private ImageView card2;
 	private ImageView card3;
@@ -26,8 +33,9 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	private ImageView playingCard;
 	private ImageView opponentPlayingCard;
 	private ImageView vira;
+	private ReceiveCardInfoTask receiveCardInfo;
+	private SendCardInfoTask sendCardInfo;
 	private TrucoManager manager;
-	private boolean turnPlayed;
 	private boolean card1Used;
 	private boolean card2Used;
 	private boolean card3Used;
@@ -36,6 +44,10 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
+		
+		setFadeIn();
+		
+		setFadeOut();
 		
 		init();
 	}
@@ -57,7 +69,6 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		card3.setOnClickListener(this);
 		
 		manager = new TrucoManager();
-		turnPlayed = false;
 		card1Used = false;
 		card2Used = false;
 		card3Used = false;
@@ -79,17 +90,24 @@ public class HostGameActivity extends Activity implements OnClickListener{
 			
 			@Override
 			protected void onPostExecute(Boolean result) {
-				if (result == true)
-					Toast.makeText(HostGameActivity.this, "SUCESSO", Toast.LENGTH_LONG).show();
-				else
-					Toast.makeText(HostGameActivity.this, "DEU MERDA", Toast.LENGTH_LONG).show();
 				super.onPostExecute(result);
+				if (result == false)
+					Toast.makeText(HostGameActivity.this, "Erro de conexão", Toast.LENGTH_LONG).show();
+				BluetoothHelper.closeSocket();
+				finish();
 			}
 		};
 		
 		sendInitalInfo.execute();
 		
-		Toast.makeText(this, Integer.toString(manager.playerTurn), Toast.LENGTH_LONG).show();
+		if (manager.playerTurn == 0)
+			Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_LONG).show();
+		else
+		{
+			Toast.makeText(this, "Esperando Jogada do Oponente", Toast.LENGTH_LONG).show();
+			setOpponentPlayingCard();
+		}
+			
 	}
 	
 	private void initCards() {
@@ -97,15 +115,56 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
 		card1.setImageDrawable(getResources().getDrawable(resourceId));
+		card1.startAnimation(fadeIn);
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
 		card2.setImageDrawable(getResources().getDrawable(resourceId));
+		card2.startAnimation(fadeIn);
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
 		card3.setImageDrawable(getResources().getDrawable(resourceId));
+		card3.startAnimation(fadeIn);
 		
 		resourceId = getResources().getIdentifier(manager.vira.fileName, "drawable", getPackageName());
 		vira.setImageDrawable(getResources().getDrawable(resourceId));
+		vira.startAnimation(fadeIn);
+	}
+	
+	private void setOpponentPlayingCard()
+	{
+		byte[] result = new byte[1024];
+		
+		try {
+			result = receiveCardInfo.execute().get();
+		} catch (InterruptedException e) {
+			Log.i(getClass().getName(), e.getMessage().toString());
+		} catch (ExecutionException e) {
+			Log.i(getClass().getName(), e.getMessage().toString());
+		}
+		
+		String cardName = "";
+		
+		try {
+			cardName = new String(result, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			Log.i(getClass().getName(), e.getMessage().toString());
+		}
+		
+		int resourceId = getResources().getIdentifier(cardName, "drawable", getPackageName());
+		opponentPlayingCard.setImageDrawable(getResources().getDrawable(resourceId));
+		opponentPlayingCard.startAnimation(fadeIn);
+		
+		manager.usedCardPlayer2++;
+		
+		if (manager.usedCardPlayer2 == 1)
+			opponentCard3.startAnimation(fadeOut);
+		if (manager.usedCardPlayer2 == 2)
+			opponentCard2.startAnimation(fadeOut);
+		if (manager.usedCardPlayer2 == 3)
+			opponentCard1.startAnimation(fadeOut);
+		
+		manager.playerTurn = 0;
+		Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_LONG).show();
 	}
 	
 	@Override
@@ -117,76 +176,65 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	@Override
 	public void onClick(View v) 
 	{
-		switch (v.getId())
+		if (manager.playerTurn == 0)
 		{
-			case R.id.imageViewCard1:
-				if (manager.playerTurn == 0 && !turnPlayed && !card1Used)
-				{
-					int resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
-					playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-					card1.setAlpha(0);
-					turnPlayed = true;
-					card1Used= true;
-					
-					AsyncTask<Void, Void, Boolean> sendCard = new AsyncTask<Void, Void, Boolean>() {
-						@Override
-						protected Boolean doInBackground(Void... params) {
-							String cardInfo = "lalala";
-							try {
-								BluetoothHelper.getBtSocket().getOutputStream().write(cardInfo.getBytes());
-							} catch (IOException e) {
-								Log.i(getClass().getName(), e.getMessage().toString());
-								return false;
-							}
-							return true;
-						}
-						
-						@Override
-						protected void onPostExecute(Boolean result) {
-							if (result == true)
-								Toast.makeText(HostGameActivity.this, "SUCESSO", Toast.LENGTH_LONG).show();
-							else
-								Toast.makeText(HostGameActivity.this, "DEU MERDA", Toast.LENGTH_LONG).show();
-							super.onPostExecute(result);
-						}
-					};
-					
-					sendCard.execute();
-				}
-				break;
-			case R.id.imageViewCard2:
-				if (manager.playerTurn == 0 && !turnPlayed && !card2Used)
-				{
-					int resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
-					playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-					card2.setAlpha(0);
-					turnPlayed = true;
-					card2Used= true;
-				}
-				break;
-			case R.id.imageViewCard3:
-				if (manager.playerTurn == 0 && !turnPlayed && !card3Used)
-				{
-					int resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
-					playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-					card3.setAlpha(0);
-					turnPlayed = true;
-					card3Used= true;
-				}
-				break;
+			switch (v.getId())
+			{
+				case R.id.imageViewCard1:
+					if (!card1Used)
+					{
+						int resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
+						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
+						card1.startAnimation(fadeOut);
+						playingCard.startAnimation(fadeIn);
+						card1Used= true;
+						manager.playerTurn = 1;
+						manager.usedCardPlayer1++;
+						sendCardInfo.execute(manager.handPlayer1[0].fileName);
+						setOpponentPlayingCard();
+					}
+					break;
+				case R.id.imageViewCard2:
+					if (!card2Used)
+					{
+						int resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
+						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
+						card2.startAnimation(fadeOut);
+						playingCard.startAnimation(fadeIn);
+						card2Used= true;
+						manager.playerTurn = 1;
+						manager.usedCardPlayer1++;
+						sendCardInfo.execute(manager.handPlayer1[1].fileName);
+						setOpponentPlayingCard();
+					}
+					break;
+				case R.id.imageViewCard3:
+					if (!card3Used)
+					{
+						int resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
+						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
+						card3.startAnimation(fadeOut);
+						playingCard.startAnimation(fadeIn);
+						card3Used= true;
+						manager.playerTurn = 1;
+						manager.usedCardPlayer1++;
+						sendCardInfo.execute(manager.handPlayer1[2].fileName);
+						setOpponentPlayingCard();
+					}
+					break;
+			}
 		}
 	}
 	
-//	private void setAnimation() 
-//	{
-//		Animation alphaAnim = new AlphaAnimation(0.0f, 1.0f);
-//		alphaAnim.setDuration(600);
-//		
-//		Animation translateAnim = new TranslateAnimation(0.0f, 0.0f, 200.0f, 0.0f);
-//		translateAnim.setDuration(600);
-//		
-//		animSet = new AnimationSet(true);
-//		animSet.addAnimation(alphaAnim);
-//		animSet.addAnimation(translateAnim);
-//	}
+	private void setFadeIn() 
+	{
+		fadeIn = new AlphaAnimation(0.0f, 1.0f);
+		fadeIn.setDuration(900);
+	}
+	
+	private void setFadeOut() 
+	{
+		fadeOut = new AlphaAnimation(1.0f, 0.0f);
+		fadeOut.setDuration(900);
+	}
 }

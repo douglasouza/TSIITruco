@@ -18,22 +18,15 @@ public class TrucoManager {
 	public Card [] handPlayer1;
 	public Card [] handPlayer2;
 	
-	public Boolean [] usedCardPlayer1;
-	
-	public Boolean [] usedCardPlayer2;
+	public int usedCardPlayer1;
+	public int usedCardPlayer2;
 	
 	
 	public TrucoManager()
 	{
 		
-		usedCardPlayer1 = new Boolean[3];
-		usedCardPlayer2 = new Boolean[3];
-		
-		for(int i = 0; i < 3; i++)
-		{
-			usedCardPlayer1[i] = false;
-			usedCardPlayer2[i] = false;
-		}
+		usedCardPlayer1 = 0;
+		usedCardPlayer2 = 0;
 		
 		bonus = 0;
 		deck = new Deck();
@@ -77,9 +70,10 @@ public class TrucoManager {
 		{
 			deck.addCard(handPlayer1[i]);
 			deck.addCard(handPlayer2[i]);
-			usedCardPlayer1[i] = false;
-			usedCardPlayer2[i] = false;
 		}
+		
+		usedCardPlayer1 = 0;
+		usedCardPlayer2 = 0;
 		
 		deck.shuffleDeck();
 	}
@@ -108,14 +102,6 @@ public class TrucoManager {
 	
 	public int compareCards(int cardIndexPlayer1, int cardIndexPlayer2)
 	{
-		
-		if(usedCardPlayer1[cardIndexPlayer1].equals(true) || usedCardPlayer2[cardIndexPlayer2].equals(true))
-		{
-			return -1;
-		}
-		
-		usedCardPlayer1[cardIndexPlayer1] = true;
-		usedCardPlayer2[cardIndexPlayer2] = true;
 		if
 		(
 				handPlayer1[cardIndexPlayer1].cardValue.ordinal() == manilha
