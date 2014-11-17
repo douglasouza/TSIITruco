@@ -82,7 +82,7 @@
         android:textSize="30sp" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/txtViewMatchScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -92,12 +92,12 @@
         android:textSize="40sp" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/txtViewGameScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_alignRight="@+id/textView1"
-        android:layout_below="@+id/textView1"
+        android:layout_alignLeft="@+id/txtViewMatchScore"
+        android:layout_alignRight="@+id/txtViewMatchScore"
+        android:layout_below="@+id/txtViewMatchScore"
         android:gravity="center"
         android:text="@string/initial_score"
         android:textColor="@android:color/white"
@@ -110,8 +110,7 @@
         android:layout_alignLeft="@+id/imageViewOpponentPlayingCard"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/decks_back"
-        android:visibility="invisible" />
+        android:src="@drawable/decks_back" />
 
     <ImageView
         android:id="@+id/imageViewOpponentPlayingCard"
@@ -121,8 +120,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
         android:layout_toLeftOf="@+id/imageViewVira"
-        android:src="@drawable/decks_back"
-        android:visibility="invisible" />
+        android:src="@drawable/decks_back" />
 
     <Button
         android:id="@+id/btnTruco"

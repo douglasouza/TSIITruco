@@ -85,10 +85,6 @@ public class LobbyActivity extends Activity {
 					
 					if (result == true)
 					{
-						txtDeviceName.clearAnimation();
-						txtOpponentDeviceName.clearAnimation();
-						txtWaitingPlayer.clearAnimation();
-						
 						Intent hostGameIntent = new Intent(LobbyActivity.this, HostGameActivity.class);
 						startActivity(hostGameIntent);
 					}
@@ -101,8 +97,6 @@ public class LobbyActivity extends Activity {
 			};
 			
 			listenTask.execute();
-			
-			
 		}
 	}
 	

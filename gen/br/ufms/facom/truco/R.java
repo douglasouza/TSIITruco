@@ -83,12 +83,12 @@ public final class R {
         public static final int imageViewSuits=0x7f070012;
         public static final int imageViewVira=0x7f070004;
         public static final int list=0x7f07000e;
-        public static final int textView1=0x7f07000a;
-        public static final int textView2=0x7f07000b;
         public static final int textView3=0x7f070008;
         public static final int txtDeviceName=0x7f070010;
         public static final int txtOpponentDeviceName=0x7f070011;
         public static final int txtSearchingDevices=0x7f07000d;
+        public static final int txtViewGameScore=0x7f07000b;
+        public static final int txtViewMatchScore=0x7f07000a;
         public static final int txtWaitingPlayer=0x7f07000f;
     }
     public static final class layout {
