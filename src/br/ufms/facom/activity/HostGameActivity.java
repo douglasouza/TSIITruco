@@ -82,8 +82,6 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		player1MatchScore = 0;
 		player2MatchScore = 0;
 		
-		manager.playerTurn = 1;
-		
 		if (manager.playerTurn == 0)
 			startedGame = true;
 		else
@@ -360,7 +358,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		receiveCardInfo.execute();
 	}
 	
-	private void doSendRoundResult(String winner) {
+	private void doSendRoundResult(final String winner) {
 		AsyncTask<String, Void, Boolean> sendRoundResult = new AsyncTask<String, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(String... params) {
@@ -384,18 +382,34 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				}
 				else
 				{
-					if (startedGame)
+					if (winner == P2_WINNER)
 					{
 						startedGame = false;
 						manager.playerTurn = 1;
 						Toast.makeText(HostGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
 						doReceiveCardInfo();
 					}
-					else
+					else if (winner == P1_WINNER)
 					{
 						startedGame = true;
 						manager.playerTurn = 0;
 						Toast.makeText(HostGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
+					}
+					else if (winner == DRAW)
+					{
+						if (startedGame)
+						{
+							startedGame = true;
+							manager.playerTurn = 0;
+							Toast.makeText(HostGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
+						}
+						else
+						{
+							startedGame = false;
+							manager.playerTurn = 1;
+							Toast.makeText(HostGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
+							doReceiveCardInfo();
+						}
 					}
 				}
 			}

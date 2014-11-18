@@ -161,7 +161,6 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 			player2GameScore++;
 			Toast.makeText(ClientGameActivity.this, "Empate!", Toast.LENGTH_LONG).show();
 		}
-			
 		
 		gameScore.setText(String.valueOf(player1GameScore) + " x " + String.valueOf(player2GameScore));
 	}
@@ -443,9 +442,10 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				} 
 				else
 				{
+					String[] gameResult = {""};
 					try {
 						String temp = new String(result, "UTF-8");
-						String[] gameResult = temp.split(",");
+						gameResult = temp.split(",");
 						setNewRound(gameResult[0]);
 					} catch (UnsupportedEncodingException e) {
 						Log.i(getClass().getName(), e.getMessage().toString());
@@ -454,18 +454,34 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 						finish();
 					}
 					
-					if (startedGame)
+					if (gameResult[0].equals(HostGameActivity.P1_WINNER))
 					{
 						playerTurn = 0;
 						startedGame = false;
 						Toast.makeText(ClientGameActivity.this, "Turno do Oponente!", Toast.LENGTH_SHORT).show();
 						doReceiveCardInfo();
 					}
-					else
+					else if (gameResult[0].equals(HostGameActivity.P2_WINNER))
 					{
 						playerTurn = 1;
 						startedGame = true;
 						Toast.makeText(ClientGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
+					}
+					else if (gameResult[0].equals(HostGameActivity.DRAW))
+					{
+						if (startedGame)
+						{
+							startedGame = true;
+							playerTurn = 0;
+							Toast.makeText(ClientGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
+						}
+						else
+						{
+							startedGame = false;
+							playerTurn = 1;
+							Toast.makeText(ClientGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
+							doReceiveCardInfo();
+						}
 					}
 				}
 			}
