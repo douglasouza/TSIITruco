@@ -9,9 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import br.ufms.facom.bluetooth.BluetoothHelper;
 import br.ufms.facom.manager.TrucoManager;
@@ -21,9 +20,8 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	
 	public static final String P1_WINNER = "Player 1 Won";
 	public static final String P2_WINNER = "Player 2 Won";
+	public static final String DRAW = "Draw";
 	
-	private Animation fadeIn;
-	private Animation fadeOut;
 	private ImageView card1;
 	private ImageView card2;
 	private ImageView card3;
@@ -33,7 +31,16 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	private ImageView playingCard;
 	private ImageView opponentPlayingCard;
 	private ImageView vira;
+	private String winner;
+	private TextView gameScore;
+	private TextView matchScore;
 	private TrucoManager manager;
+	private int cardPlayedIndex;
+	private int opponentPlayedCardIndex;
+	private int player1GameScore;
+	private int player2GameScore;
+	private int player1MatchScore;
+	private int player2MatchScore;
 	private boolean card1Used;
 	private boolean card2Used;
 	private boolean card3Used;
@@ -43,10 +50,6 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
-		
-		setFadeIn();
-		
-		setFadeOut();
 		
 		init();
 	}
@@ -62,6 +65,8 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		playingCard = (ImageView) findViewById(R.id.imageViewPlayingCard);
 		opponentPlayingCard = (ImageView) findViewById(R.id.imageViewOpponentPlayingCard);
 		vira = (ImageView) findViewById(R.id.imageViewVira);
+		gameScore = (TextView) findViewById(R.id.txtViewGameScore);
+		matchScore = (TextView) findViewById(R.id.txtViewMatchScore);
 		
 		card1.setOnClickListener(this);
 		card2.setOnClickListener(this);
@@ -72,7 +77,12 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		card2Used = false;
 		card3Used = false;
 		
-		manager.playerTurn = 0;
+		player1GameScore = 0;
+		player2GameScore = 0;
+		player1MatchScore = 0;
+		player2MatchScore = 0;
+		
+		manager.playerTurn = 1;
 		
 		if (manager.playerTurn == 0)
 			startedGame = true;
@@ -84,51 +94,12 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		doSendInitialInfo();
 		
 		if (manager.playerTurn == 0)
-			Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_SHORT).show();
 		else
 		{
-			Toast.makeText(this, "Turno do Oponente", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
 			
-			AsyncTask<Void, Void, byte[]> receiveCardInfo = new AsyncTask<Void, Void, byte[]>() {
-				@Override
-				protected byte[] doInBackground(Void... params) {
-					byte[] buffer = new byte[128];
-					try {
-						BluetoothHelper.getBtSocket().getInputStream().read(buffer);
-					} catch (IOException e) {
-						Log.i(getClass().getName(), e.getMessage().toString());
-						return null;
-					}
-					return buffer;
-				}
-				
-				@Override
-				protected void onPostExecute(byte[] result) {
-					super.onPostExecute(result);
-					if (result == null)
-					{
-						Toast.makeText(HostGameActivity.this, "Falha de conexão. Jogo encerrado!", Toast.LENGTH_LONG).show();
-						BluetoothHelper.closeSocket();
-						finish();
-					} 
-					else
-					{
-						try {
-							String temp = new String(result, "UTF-8");
-							String[] cardName = temp.split(",");
-							Log.i(getClass().getName(), cardName[0]);
-							setOpponentPlayingCard(cardName[0]);
-						} catch (UnsupportedEncodingException e) {
-							Log.i(getClass().getName(), e.getMessage().toString());
-							Toast.makeText(HostGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
-							BluetoothHelper.closeSocket();
-							finish();
-						}
-					}
-				}
-			};
-			
-			receiveCardInfo.execute();
+			doReceiveCardInfo();
 		}
 	}
 	
@@ -137,44 +108,38 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
 		card1.setImageDrawable(getResources().getDrawable(resourceId));
-		card1.startAnimation(fadeIn);
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
 		card2.setImageDrawable(getResources().getDrawable(resourceId));
-		card2.startAnimation(fadeIn);
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
 		card3.setImageDrawable(getResources().getDrawable(resourceId));
-		card3.startAnimation(fadeIn);
-		
+
 		resourceId = getResources().getIdentifier(manager.vira.fileName, "drawable", getPackageName());
 		vira.setImageDrawable(getResources().getDrawable(resourceId));
-		vira.startAnimation(fadeIn);
 	}
 	
 	private void setOpponentPlayingCard(String cardName)
 	{		
 		int resourceId = getResources().getIdentifier(cardName, "drawable", getPackageName());
 		opponentPlayingCard.setImageDrawable(getResources().getDrawable(resourceId));
-		opponentPlayingCard.startAnimation(fadeIn);
 		
 		manager.usedCardPlayer2++;
 		
 		if (manager.usedCardPlayer2 == 1)
-			opponentCard3.startAnimation(fadeOut);
-		if (manager.usedCardPlayer2 == 2)
-			opponentCard2.startAnimation(fadeOut);
-		if (manager.usedCardPlayer2 == 3)
-			opponentCard1.startAnimation(fadeOut);
+			opponentCard3.setVisibility(ImageView.INVISIBLE);
+		else if (manager.usedCardPlayer2 == 2)
+			opponentCard2.setVisibility(ImageView.INVISIBLE);
+		else if (manager.usedCardPlayer1 == 3)
+			opponentCard2.setVisibility(ImageView.INVISIBLE);
 		
 		manager.playerTurn = 0;
-		Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_LONG).show();
 	}
 	
 	@Override
 	public void onBackPressed() {
 		BluetoothHelper.closeSocket();
-		finish();
+		super.onBackPressed();
 	}
 
 	@Override
@@ -189,20 +154,13 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					{
 						int resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-						card1.startAnimation(fadeOut);
-						playingCard.startAnimation(fadeIn);
+						card1.setVisibility(ImageView.INVISIBLE);
+						cardPlayedIndex = 0;
 						card1Used = true;
 						manager.playerTurn = 1;
 						manager.usedCardPlayer1++;
 						
-						if (manager.compareCards(0, 0) == 1)
-							doSendRoundResult(P1_WINNER);
-						else
-							doSendRoundResult(P2_WINNER);
-							
-						//doSendCardInfo(manager.handPlayer1[0].fileName);
-						
-						doReceiveCardInfo();
+						doSendCardInfo(manager.handPlayer1[0].fileName);
 					}
 					break;
 				case R.id.imageViewCard2:
@@ -210,15 +168,13 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					{
 						int resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-						card2.startAnimation(fadeOut);
-						playingCard.startAnimation(fadeIn);
+						card2.setVisibility(ImageView.INVISIBLE);
+						cardPlayedIndex = 1;
 						card2Used = true;
 						manager.playerTurn = 1;
 						manager.usedCardPlayer1++;
 						
 						doSendCardInfo(manager.handPlayer1[1].fileName);
-						
-						doReceiveCardInfo();
 					}
 					break;
 				case R.id.imageViewCard3:
@@ -226,33 +182,54 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					{
 						int resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-						card3.startAnimation(fadeOut);
-						playingCard.startAnimation(fadeIn);
+						card3.setVisibility(ImageView.INVISIBLE);
+						cardPlayedIndex = 2;
 						card3Used = true;
 						manager.playerTurn = 1;
 						manager.usedCardPlayer1++;
 						
 						doSendCardInfo(manager.handPlayer1[2].fileName);
-						
-						doReceiveCardInfo();
 					}
 					break;
 			}
 		}
 	}
 	
-	private void setFadeIn() 
-	{
-		fadeIn = new AlphaAnimation(0.0f, 1.0f);
-		fadeIn.setDuration(900);
+	private void calculateGameWinner() {
+		
+		if (manager.compareCards(cardPlayedIndex, opponentPlayedCardIndex) == 1)
+		{
+			player1GameScore++;
+			
+			gameScore.setText(String.valueOf(player1GameScore) + " x " + String.valueOf(player2GameScore));
+											
+			Toast.makeText(HostGameActivity.this, "Você venceu!", Toast.LENGTH_LONG).show();
+			
+			winner = P1_WINNER;
+		}
+		else if (manager.compareCards(cardPlayedIndex, opponentPlayedCardIndex) == 2)
+		{
+			player2GameScore++;
+			
+			gameScore.setText(String.valueOf(player1GameScore) + " x " + String.valueOf(player2GameScore));
+			
+			Toast.makeText(HostGameActivity.this, "Você perdeu!", Toast.LENGTH_LONG).show();
+			
+			winner = P2_WINNER;
+		}
+		else
+		{
+			player1GameScore++;
+			player2GameScore++;
+			
+			gameScore.setText(String.valueOf(player1GameScore) + " x " + String.valueOf(player2GameScore));
+			
+			Toast.makeText(HostGameActivity.this, "Empate!", Toast.LENGTH_LONG).show();
+			
+			winner = DRAW;
+		}
 	}
-	
-	private void setFadeOut() 
-	{
-		fadeOut = new AlphaAnimation(1.0f, 0.0f);
-		fadeOut.setDuration(900);
-	}
-	
+
 	private void doSendInitialInfo() {
 		AsyncTask<Void, Void, Boolean> sendInitalInfo = new AsyncTask<Void, Void, Boolean>() {
 			@Override
@@ -282,8 +259,16 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		sendInitalInfo.execute();
 	}
 	
-	private void doSendCardInfo(String cardName) {
+	private void doSendCardInfo(final String cardName) {
 		AsyncTask<String, Void, Boolean> sendCardInfo = new AsyncTask<String, Void, Boolean>() {
+			
+			@Override
+			protected void onPreExecute() {
+				if (startedGame)
+					Toast.makeText(HostGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
+				super.onPreExecute();
+			}
+			
 			@Override
 			protected Boolean doInBackground(String... params) {
 				try {
@@ -303,6 +288,18 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					Toast.makeText(HostGameActivity.this, "Falha de conexão. Jogo encerrado!", Toast.LENGTH_LONG).show();
 					BluetoothHelper.closeSocket();
 					finish();
+				}
+				else
+				{
+					if (startedGame)
+					{
+						doReceiveCardInfo();
+					}
+					else
+					{
+						calculateGameWinner();
+						doSendRoundResult(winner);
+					}
 				}
 			}
 		};
@@ -337,15 +334,25 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				{
 					try {
 						String temp = new String(result, "UTF-8");
-						String[] cardName = temp.split(",");
-						Log.i(getClass().getName(), cardName[0]);
-						setOpponentPlayingCard(cardName[0]);
+						String[] receivedData = temp.split(",");
+						Log.i(getClass().getName(), receivedData[0]);
+						opponentPlayedCardIndex = Integer.parseInt(receivedData[1]);
+						setOpponentPlayingCard(receivedData[0]);
+						manager.playerTurn = 0;
 					} catch (UnsupportedEncodingException e) {
 						Log.i(getClass().getName(), e.getMessage().toString());
 						Toast.makeText(HostGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
 						BluetoothHelper.closeSocket();
 						finish();
 					}
+					
+					if (startedGame)
+					{
+						calculateGameWinner();
+						doSendRoundResult(winner);
+					}
+					else
+						Toast.makeText(HostGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		};
@@ -353,8 +360,8 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		receiveCardInfo.execute();
 	}
 	
-	private void doSendRoundResult(String cardName) {
-		AsyncTask<String, Void, Boolean> sendCardInfo = new AsyncTask<String, Void, Boolean>() {
+	private void doSendRoundResult(String winner) {
+		AsyncTask<String, Void, Boolean> sendRoundResult = new AsyncTask<String, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(String... params) {
 				try {
@@ -375,9 +382,60 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					BluetoothHelper.closeSocket();
 					finish();
 				}
+				else
+				{
+					if (startedGame)
+					{
+						startedGame = false;
+						manager.playerTurn = 1;
+						Toast.makeText(HostGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
+						doReceiveCardInfo();
+					}
+					else
+					{
+						startedGame = true;
+						manager.playerTurn = 0;
+						Toast.makeText(HostGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
+					}
+				}
 			}
 		};
 		
-		sendCardInfo.execute(cardName);
+		sendRoundResult.execute(winner);
+	}
+	
+	private void doSendCardRoundResult(String cardWinner) {
+		AsyncTask<String, Void, Boolean> sendCardRoundResult = new AsyncTask<String, Void, Boolean>() {
+			@Override
+			protected Boolean doInBackground(String... params) {
+				try {
+					BluetoothHelper.getBtSocket().getOutputStream().write((params[0] + ",").getBytes());
+				} catch (IOException e) {
+					Log.i(getClass().getName(), e.getMessage().toString());
+					return false;
+				}
+				return true;
+			}
+			
+			@Override
+			protected void onPostExecute(Boolean result) {
+				super.onPostExecute(result);
+				if (result == false)
+				{
+					Toast.makeText(HostGameActivity.this, "Falha de conexão. Jogo encerrado!", Toast.LENGTH_LONG).show();
+					BluetoothHelper.closeSocket();
+					finish();
+				}
+//				else
+//				{
+//					if (startedGame)
+//						startedGame = false;
+//					else
+//						startedGame = true;
+//				}
+			}
+		};
+		
+		sendCardRoundResult.execute(cardWinner);
 	}
 }

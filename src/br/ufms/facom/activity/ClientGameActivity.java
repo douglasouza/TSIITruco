@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +17,6 @@ import br.ufms.facom.truco.R;
 
 public class ClientGameActivity extends Activity implements OnClickListener{
 
-	private Animation fadeIn;
-	private Animation fadeOut;
 	private ImageView card1;
 	private ImageView card2;
 	private ImageView card3;
@@ -48,10 +44,6 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
-		
-		setFadeIn();
-		
-		setFadeOut();
 		
 		init();
 	}
@@ -109,22 +101,20 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	{
 		int resourceId = getResources().getIdentifier(cardName, "drawable", getPackageName());
 		opponentPlayingCard.setImageDrawable(getResources().getDrawable(resourceId));
-		opponentPlayingCard.startAnimation(fadeIn);
 		
 		usedCardPlayer1++;
 		
 		if (usedCardPlayer1 == 1)
-			opponentCard3.startAnimation(fadeOut);
+			opponentCard3.setVisibility(ImageView.INVISIBLE);
 		if (usedCardPlayer1 == 2)
-			opponentCard2.startAnimation(fadeOut);
+			opponentCard2.setVisibility(ImageView.INVISIBLE);
 		if (usedCardPlayer1 == 3)
-			opponentCard1.startAnimation(fadeOut);
+			opponentCard1.setVisibility(ImageView.INVISIBLE);
 		
 		playerTurn = 1;
-		Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_LONG).show();
 	}
 	
-	private void setNewGame(String winner, String gameValue)
+	private void setNewGame(String winner)
 	{
 		if (winner.equals(HostGameActivity.P1_WINNER))
 		{
@@ -160,11 +150,18 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 			player1GameScore++;
 			Toast.makeText(ClientGameActivity.this, "Você perdeu!", Toast.LENGTH_LONG).show();
 		}
-		else
+		else if (winner.equals(HostGameActivity.P2_WINNER))
 		{
 			player2GameScore++;
 			Toast.makeText(ClientGameActivity.this, "Você venceu!", Toast.LENGTH_LONG).show();
 		}
+		else
+		{
+			player1GameScore++;
+			player2GameScore++;
+			Toast.makeText(ClientGameActivity.this, "Empate!", Toast.LENGTH_LONG).show();
+		}
+			
 		
 		gameScore.setText(String.valueOf(player1GameScore) + " x " + String.valueOf(player2GameScore));
 	}
@@ -172,7 +169,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	@Override
 	public void onBackPressed() {
 		BluetoothHelper.closeSocket();
-		finish();
+		super.onBackPressed();
 	}
 	
 	@Override
@@ -187,17 +184,12 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					{
 						int resourceId = getResources().getIdentifier(turnAndCardsNames[1], "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-						card1.startAnimation(fadeOut);
-						playingCard.startAnimation(fadeIn);
+						card1.setVisibility(ImageView.INVISIBLE);
 						card1Used = true;
 						playerTurn = 0;
 						
-						doSendCardInfo(turnAndCardsNames[1]);
-						
-						if (startedGame)
-							doReceiveCardInfo();
-						else
-							doReceiveRoundResult();
+						//send card name and card index
+						doSendCardInfo(turnAndCardsNames[1] + ",0,");
 					}
 					break;
 				case R.id.imageViewCard2:
@@ -205,17 +197,12 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					{
 						int resourceId = getResources().getIdentifier(turnAndCardsNames[2], "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-						card2.startAnimation(fadeOut);
-						playingCard.startAnimation(fadeIn);
+						card2.setVisibility(ImageView.INVISIBLE);
 						card2Used = true;
 						playerTurn = 0;
 						
-						doSendCardInfo(turnAndCardsNames[2]);
-						
-						if (startedGame)
-							doReceiveCardInfo();
-						else
-							doReceiveRoundResult();
+						//send card name and card index
+						doSendCardInfo(turnAndCardsNames[2] + ",1,");
 					}
 					break;
 				case R.id.imageViewCard3:
@@ -223,33 +210,16 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					{
 						int resourceId = getResources().getIdentifier(turnAndCardsNames[3], "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
-						card3.startAnimation(fadeOut);
-						playingCard.startAnimation(fadeIn);
+						card3.setVisibility(ImageView.INVISIBLE);
 						card3Used = true;
 						playerTurn = 0;
 						
-						doSendCardInfo(turnAndCardsNames[3]);
-						
-						if (startedGame)
-							doReceiveCardInfo();
-						else
-							doReceiveRoundResult();
+						//send card name and card index
+						doSendCardInfo(turnAndCardsNames[3] + ",2,");
 					}
 					break;
 			}
 		}
-	}
-	
-	private void setFadeIn() 
-	{
-		fadeIn = new AlphaAnimation(0.0f, 1.0f);
-		fadeIn.setDuration(900);
-	}
-	
-	private void setFadeOut() 
-	{
-		fadeOut = new AlphaAnimation(1.0f, 0.0f);
-		fadeOut.setDuration(900);
 	}
 	
 	private void doReceiveInitialInfo() {
@@ -270,7 +240,8 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 			protected void onPostExecute(byte[] result) {
 				if (result != null)
 				{
-					try {
+					try 
+					{
 						String temp = new String(result, "UTF-8");
 						turnAndCardsNames = temp.split(",");
 						playerTurn = Integer.parseInt(turnAndCardsNames[0]);
@@ -279,54 +250,18 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 						if (playerTurn == 1)
 						{
 							startedGame = true;
-							Toast.makeText(ClientGameActivity.this, "Faça Sua Jogada", Toast.LENGTH_LONG).show();
+							Toast.makeText(ClientGameActivity.this, "Faça Sua Jogada", Toast.LENGTH_SHORT).show();
 						}
 						else
 						{
 							startedGame = false;
-							Toast.makeText(ClientGameActivity.this, "Turno do Oponente", Toast.LENGTH_LONG).show();
+							Toast.makeText(ClientGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
 							
-							AsyncTask<Void, Void, byte[]> receiveCardInfo = new AsyncTask<Void, Void, byte[]>() {
-								@Override
-								protected byte[] doInBackground(Void... params) {
-									byte[] buffer = new byte[128];
-									try {
-										BluetoothHelper.getBtSocket().getInputStream().read(buffer);
-									} catch (IOException e) {
-										Log.i(getClass().getName(), e.getMessage().toString());
-										return null;
-									}
-									return buffer;
-								}
-								
-								@Override
-								protected void onPostExecute(byte[] result) {
-									super.onPostExecute(result);
-									if (result == null)
-									{
-										Toast.makeText(ClientGameActivity.this, "Falha de conexão. Jogo encerrado!", Toast.LENGTH_LONG).show();
-										BluetoothHelper.closeSocket();
-										finish();
-									} 
-									else
-									{
-										try {
-											String temp = new String(result, "UTF-8");
-											String[] cardName = temp.split(",");
-											setOpponentPlayingCard(cardName[0]);
-										} catch (UnsupportedEncodingException e) {
-											Log.i(getClass().getName(), e.getMessage().toString());
-											Toast.makeText(ClientGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
-											BluetoothHelper.closeSocket();
-											finish();
-										}
-									}
-								}
-							};
-							
-							receiveCardInfo.execute();
+							doReceiveCardInfo();
 						}
-					} catch (UnsupportedEncodingException e) {
+					} 
+					catch (UnsupportedEncodingException e) 
+					{
 						Log.i(getClass().getName(), e.getMessage().toString());
 						Toast.makeText(ClientGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
 						BluetoothHelper.closeSocket();
@@ -348,6 +283,14 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	
 	private void doSendCardInfo(String sendData) {
 		AsyncTask<String, Void, Boolean> sendCardInfo = new AsyncTask<String, Void, Boolean>() {
+			
+			@Override
+			protected void onPreExecute() {
+				if (startedGame)
+					Toast.makeText(ClientGameActivity.this, "Turno do Oponente!", Toast.LENGTH_SHORT).show();
+				super.onPreExecute();
+			}
+			
 			@Override
 			protected Boolean doInBackground(String... params) {
 				try {
@@ -368,10 +311,21 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					BluetoothHelper.closeSocket();
 					finish();
 				}
+				else
+				{
+					if (startedGame)
+					{
+						doReceiveCardInfo();
+					}
+					else
+					{
+						doReceiveRoundResult();
+					}
+				}
 			}
 		};
 		
-		sendCardInfo.execute(turnAndCardsNames[1]);		
+		sendCardInfo.execute(sendData);
 	}
 	
 	private void doReceiveCardInfo() {
@@ -399,16 +353,22 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				} 
 				else
 				{
-					try {
+					try 
+					{
 						String temp = new String(result, "UTF-8");
 						String[] cardName = temp.split(",");
 						setOpponentPlayingCard(cardName[0]);
-					} catch (UnsupportedEncodingException e) {
+					} 
+					catch (UnsupportedEncodingException e) 
+					{
 						Log.i(getClass().getName(), e.getMessage().toString());
 						Toast.makeText(ClientGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
 						BluetoothHelper.closeSocket();
 						finish();
 					}
+					
+					if (startedGame)
+						doReceiveRoundResult();
 				}
 			}
 		};
@@ -444,7 +404,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					try {
 						String temp = new String(result, "UTF-8");
 						String[] gameResult = temp.split(",");
-						setNewGame(gameResult[0], gameResult[1]);
+						setNewGame(gameResult[0]);
 					} catch (UnsupportedEncodingException e) {
 						Log.i(getClass().getName(), e.getMessage().toString());
 						Toast.makeText(ClientGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
@@ -492,6 +452,20 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 						Toast.makeText(ClientGameActivity.this, "Infelizmente ocorreu um erro. Jogo encerrado!", Toast.LENGTH_LONG).show();
 						BluetoothHelper.closeSocket();
 						finish();
+					}
+					
+					if (startedGame)
+					{
+						playerTurn = 0;
+						startedGame = false;
+						Toast.makeText(ClientGameActivity.this, "Turno do Oponente!", Toast.LENGTH_SHORT).show();
+						doReceiveCardInfo();
+					}
+					else
+					{
+						playerTurn = 1;
+						startedGame = true;
+						Toast.makeText(ClientGameActivity.this, "Faça sua Jogada!", Toast.LENGTH_SHORT).show();
 					}
 				}
 			}
