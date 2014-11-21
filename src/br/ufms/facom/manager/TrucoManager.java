@@ -11,6 +11,7 @@ public class TrucoManager {
 	public static final int GAME_P1_WINNER = 1;
 	public static final int GAME_P2_WINNER = 2;
 	public static final int GAME_DRAW = 0;
+	public static final int NO_WINNER_YET = -1;
 	
 	public static final int ROUND_P1_WINNER = 1;
 	public static final int ROUND_P2_WINNER = 2;
@@ -145,7 +146,7 @@ public class TrucoManager {
 			return GAME_P2_WINNER;
 		}
 		
-		return GAME_DRAW; // Ainda não houve vencedor
+		return NO_WINNER_YET; // Ainda não houve vencedor
 	}
 	
 	// Se não houve vencedor no segundo round, verifica-se novamente no fim da rodada, chamando esse método
@@ -156,12 +157,12 @@ public class TrucoManager {
 		 * ou cada jogador venceu uma. Em suma o jogo está empatado.
 		 * Quem vencer o terceiro round, ganha a rodada.
 		 */
-		if (thirdRoundResult.equals(P1_WINNER))
+		if (thirdRoundResult == ROUND_P1_WINNER)
 		{
 			player1MatchScore += 1;
 			return GAME_P1_WINNER;
 		}
-		else if (thirdRoundResult.equals(P2_WINNER))
+		else if (thirdRoundResult == ROUND_P2_WINNER)
 		{
 			player2MatchScore += 1;
 			return GAME_P2_WINNER;
@@ -171,71 +172,97 @@ public class TrucoManager {
 	}
 	
 	// Verifica quem venceu o round baseado nas cartas de cada jogador
-	public int compareCards(int cardIndexPlayer1, int cardIndexPlayer2)
+	public int compareCards(int cardIndexPlayer1, int cardIndexPlayer2, int roundCount)
 	{
-		if
-		(
-				handPlayer1[cardIndexPlayer1].cardValue.ordinal() == manilha
-				&&
-				handPlayer2[cardIndexPlayer2].cardValue.ordinal() == manilha
-		)
+		if (handPlayer1[cardIndexPlayer1].cardValue.ordinal() == manilha && handPlayer2[cardIndexPlayer2].cardValue.ordinal() == manilha)
 		{
-			if
-			(
-					handPlayer1[cardIndexPlayer1].suit.ordinal()
-					>
-					handPlayer2[cardIndexPlayer2].suit.ordinal()					
-			)
+			if (handPlayer1[cardIndexPlayer1].suit.ordinal() > handPlayer2[cardIndexPlayer2].suit.ordinal())
 			{
+				if (roundCount == 1)
+					firstRoundResult = ROUND_P1_WINNER;
+				else if (roundCount == 2)
+					secondRoundResult = ROUND_P1_WINNER;
+				else if (roundCount == 3)
+					thirdRoundResult = ROUND_P1_WINNER;
+				
 				player1GameScore += 1;
 				return ROUND_P1_WINNER;
 			}
 			else
 			{
+				if (roundCount == 1)
+					firstRoundResult = ROUND_P2_WINNER;
+				else if (roundCount == 2)
+					secondRoundResult = ROUND_P2_WINNER;
+				else if (roundCount == 3)
+					thirdRoundResult = ROUND_P2_WINNER;
+				
 				player2GameScore += 1;
 				return ROUND_P2_WINNER;
 			}
 		}
-		else if(handPlayer1[cardIndexPlayer1].cardValue.ordinal() == manilha)
+		else if (handPlayer1[cardIndexPlayer1].cardValue.ordinal() == manilha)
 		{
+			if (roundCount == 1)
+				firstRoundResult = ROUND_P1_WINNER;
+			else if (roundCount == 2)
+				secondRoundResult = ROUND_P1_WINNER;
+			else if (roundCount == 3)
+				thirdRoundResult = ROUND_P1_WINNER;
+			
 			player1GameScore += 1;
 			return ROUND_P1_WINNER;
 		}
-		else if(handPlayer2[cardIndexPlayer2].cardValue.ordinal() == manilha)
+		else if (handPlayer2[cardIndexPlayer2].cardValue.ordinal() == manilha)
 		{
+			if (roundCount == 1)
+				firstRoundResult = ROUND_P2_WINNER;
+			else if (roundCount == 2)
+				secondRoundResult = ROUND_P2_WINNER;
+			else if (roundCount == 3)
+				thirdRoundResult = ROUND_P2_WINNER;
+			
 			player2GameScore += 1;
 			return ROUND_P2_WINNER;
 		}
 		else
 		{
-			if
-			(
-					handPlayer1[cardIndexPlayer1].cardValue.ordinal()
-					>
-					handPlayer2[cardIndexPlayer2].cardValue.ordinal()
-					
-			)
+			if (handPlayer1[cardIndexPlayer1].cardValue.ordinal() > handPlayer2[cardIndexPlayer2].cardValue.ordinal())
 			{
+				if (roundCount == 1)
+					firstRoundResult = ROUND_P1_WINNER;
+				else if (roundCount == 2)
+					secondRoundResult = ROUND_P1_WINNER;
+				else if (roundCount == 3)
+					thirdRoundResult = ROUND_P1_WINNER;
+				
 				player1GameScore += 1;
 				return ROUND_P1_WINNER;
 			}
-			else if
-			(
-					handPlayer1[cardIndexPlayer1].cardValue.ordinal()
-					<
-					handPlayer2[cardIndexPlayer2].cardValue.ordinal()
-			)
+			else if (handPlayer1[cardIndexPlayer1].cardValue.ordinal() < handPlayer2[cardIndexPlayer2].cardValue.ordinal())
 			{
+				if (roundCount == 1)
+					firstRoundResult = ROUND_P2_WINNER;
+				else if (roundCount == 2)
+					secondRoundResult = ROUND_P2_WINNER;
+				else if (roundCount == 3)
+					thirdRoundResult = ROUND_P2_WINNER;
+				
 				player2GameScore += 1;
 				return ROUND_P2_WINNER;
 			}
 			//empate
 			else
 			{
+				if (roundCount == 1)
+					firstRoundResult = ROUND_DRAW;
+				else if (roundCount == 2)
+					secondRoundResult = ROUND_DRAW;
+				else if (roundCount == 3)
+					thirdRoundResult = ROUND_DRAW;
+				
 				return ROUND_DRAW;
 			}
 		}
 	}
-	
-	
 }
