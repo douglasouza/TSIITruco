@@ -54,7 +54,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		init();
 	}
 
-	private void init() 
+	private void init()
 	{
 		card1 = (ImageView) findViewById(R.id.imageViewCard1);
 		card2 = (ImageView) findViewById(R.id.imageViewCard2);
@@ -193,8 +193,8 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		}
 	}
 	
-	private void calculateGameWinner() {
-		
+	private void calculateGameWinner() 
+	{
 		if (manager.compareCards(cardPlayedIndex, opponentPlayedCardIndex) == 1)
 		{
 			player1GameScore++;
@@ -440,13 +440,6 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					BluetoothHelper.closeSocket();
 					finish();
 				}
-//				else
-//				{
-//					if (startedGame)
-//						startedGame = false;
-//					else
-//						startedGame = true;
-//				}
 			}
 		};
 		

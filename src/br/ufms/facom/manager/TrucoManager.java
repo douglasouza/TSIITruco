@@ -4,9 +4,17 @@ import java.util.Random;
 
 public class TrucoManager {
 	
+	public static final String P1_WINNER = "P1WIN";
+	public static final String P2_WINNER = "P2WIN";
+	public static final String DRAW = "DRAW";
+	
 	public Deck deck;
 	public Card vira;
 	public int manilha;
+	
+	public String firstRoundResult;
+	public String secondRoundResult;
+	public String thirdRoundResult;
 	
 	public int scorePlayer1;
 	public int scorePlayer2;
@@ -80,6 +88,8 @@ public class TrucoManager {
 	
 	public void newTurn()
 	{
+		handPlayer1 = new Card[3];
+		
 		for(int i = 0; i < 3; i++)
 		{
 			handPlayer1[i] = deck.removeCard();	
@@ -98,6 +108,50 @@ public class TrucoManager {
 	public void giveBonus()
 	{
 		bonus +=3;
+	}
+	
+	// Verifica se já tem um vencedor da rodada (game) no segundo round
+	public int secondRoundWinner()
+	{
+		if (firstRoundResult.equals(DRAW)) // Empate no primeiro round, quem ganhar o segundo, ganha a rodada
+		{
+			if (secondRoundResult.equals(P1_WINNER))
+				return 1;
+			else if (secondRoundResult.equals(P2_WINNER))
+				return 2;				
+		}
+		
+		if (secondRoundResult.equals(DRAW)) // Empate no segundo round, quem ganhou o primeiro, ganha a rodada
+		{
+			if (firstRoundResult.equals(P1_WINNER))
+				return 1;
+			else if (firstRoundResult.equals(P2_WINNER))
+				return 2;				
+		}
+		
+		// Se algum jogador ganhou dois rounds, ganhou a rodada
+		if (firstRoundResult.equals(P1_WINNER) && secondRoundResult.equals(P1_WINNER))
+			return 1;
+		else if (firstRoundResult.equals(P2_WINNER) && secondRoundResult.equals(P2_WINNER))
+			return 2;
+		
+		return 0; // Ainda não houve vencedor
+	}
+	
+	// Se não houve vencedor no segundo round, verifica-se novamente no fim da rodada, chamando esse método
+	public int gameResult()
+	{
+		/*
+		 * Se esse método precisou ser chamado, então houve dois empates, 
+		 * ou cada jogador venceu uma. Em suma o jogo está empatado.
+		 * Quem vencer o terceiro round, ganha a rodada.
+		 */
+		if (thirdRoundResult.equals(P1_WINNER))
+			return 1;
+		else if (thirdRoundResult.equals(P2_WINNER))
+			return 2;
+		
+		return 0; // Três empates, ninguém ganha
 	}
 	
 	public int compareCards(int cardIndexPlayer1, int cardIndexPlayer2)

@@ -77,12 +77,7 @@ public class BluetoothHelper {
 	     discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 	     activity.startActivityForResult(discoverableIntent, REQUEST_DISCOVERABLE_BT);
 	}
-	
-	public static boolean isConnected()
-	{
-		return btSocket.isConnected();
-	}
-	
+
 	public static void closeSocket()
 	{
 		try {
