@@ -8,53 +8,77 @@ public class TrucoManager {
 	public static final String P2_WINNER = "P2WIN";
 	public static final String DRAW = "DRAW";
 	
+	public static final int GAME_P1_WINNER = 1;
+	public static final int GAME_P2_WINNER = 2;
+	public static final int GAME_DRAW = 0;
+	
+	public static final int ROUND_P1_WINNER = 1;
+	public static final int ROUND_P2_WINNER = 2;
+	public static final int ROUND_DRAW = 0;
+	
+	/*
+	 * Match = Partida
+	 * Game = Rodada
+	 * Round = 1/3 da rodada
+	 */
+	
 	public Deck deck;
 	public Card vira;
 	public int manilha;
 	
-	public String firstRoundResult;
-	public String secondRoundResult;
-	public String thirdRoundResult;
+	// Resultados de cada round
+	public int firstRoundResult; 
+	public int secondRoundResult;
+	public int thirdRoundResult;
 	
-	public int scorePlayer1;
-	public int scorePlayer2;
+	// Pontuacao de cada jogador dentro da rodada
+	public int player1GameScore;
+	public int player2GameScore;
 	
-	public int bonus;
+	// Pontuacao de cada jogador dentro da partida
+	public int player1MatchScore;
+	public int player2MatchScore;
 	
+	// Valor dessa rodada com relacao a partida. Default = 1. Incrementado com chamadas de truco
+	public int gameValue;
+	
+	// Indica de quem é a vez de jogar
 	public int playerTurn;
 	
+	// Cartas de cada jogador
 	public Card [] handPlayer1;
 	public Card [] handPlayer2;
 	
-	public int usedCardPlayer1;
-	public int usedCardPlayer2;
-	
-	
+	// Nova Partida
 	public TrucoManager()
 	{
-		
-		usedCardPlayer1 = 0;
-		usedCardPlayer2 = 0;
-		
-		bonus = 0;
 		deck = new Deck();
 		deck.shuffleDeck();
-		scorePlayer1 = scorePlayer2 = 0;
-		handPlayer1 = new Card[3];
-		for(int i = 0; i < 3; i++)
-		{
-			handPlayer1[i] = deck.removeCard();	
-		}
 		
+		player1MatchScore = 0;
+		player2MatchScore = 0;
+	}
+	
+	// Nova Rodada
+	public void newGame()
+	{
+		gameValue = 1;
+		
+		player1GameScore = 0;
+		player1GameScore = 0;
+		
+		handPlayer1 = new Card[3];
 		handPlayer2 = new Card[3];
 		
 		for(int i = 0; i < 3; i++)
 		{
+			handPlayer1[i] = deck.removeCard();
 			handPlayer2[i] = deck.removeCard();	
 		}
-		
+
 		vira = deck.removeCard();
-		//caso o vira seja a carta mais valiosa
+		
+		// Caso o vira seja a carta mais valiosa (3)
 		if(vira.cardValue.ordinal() == 9)
 		{
 			manilha = 0;
@@ -64,78 +88,64 @@ public class TrucoManager {
 			manilha = (vira.cardValue.ordinal())+ 1;
 		}
 		
+		// Define quem começa a rodada aleatoriamente
 		Random rand = new Random();
-		
 		playerTurn = rand.nextInt(2);
 	}
 	
-	public void returnCards()
+	// Aumenta o valor da rodada. (Truco)
+	public void increaseGameValue()
 	{
-		bonus = 0;
-		
-		deck.addCard(vira);
-		for(int i = 0; i < 3; i++)
-		{
-			deck.addCard(handPlayer1[i]);
-			deck.addCard(handPlayer2[i]);
-		}
-		
-		usedCardPlayer1 = 0;
-		usedCardPlayer2 = 0;
-		
-		deck.shuffleDeck();
-	}
-	
-	public void newTurn()
-	{
-		handPlayer1 = new Card[3];
-		
-		for(int i = 0; i < 3; i++)
-		{
-			handPlayer1[i] = deck.removeCard();	
-		}
-		
-		handPlayer2 = new Card[3];
-		
-		for(int i = 0; i < 3; i++)
-		{
-			handPlayer2[i] = deck.removeCard();	
-		}
-		
-		vira = deck.removeCard();
-	}
-	
-	public void giveBonus()
-	{
-		bonus +=3;
+		if (gameValue == 1)
+			gameValue += 2;
+		else
+			gameValue += 3;
 	}
 	
 	// Verifica se já tem um vencedor da rodada (game) no segundo round
 	public int secondRoundWinner()
 	{
-		if (firstRoundResult.equals(DRAW)) // Empate no primeiro round, quem ganhar o segundo, ganha a rodada
+		if (firstRoundResult == ROUND_DRAW) // Empate no primeiro round, quem ganhar o segundo, ganha a rodada
 		{
-			if (secondRoundResult.equals(P1_WINNER))
-				return 1;
-			else if (secondRoundResult.equals(P2_WINNER))
-				return 2;				
+			if (secondRoundResult == ROUND_P1_WINNER)
+			{
+				player1MatchScore += 1;
+				return GAME_P1_WINNER;
+			}
+			else if (secondRoundResult == ROUND_P2_WINNER)
+			{
+				player2MatchScore += 1;
+				return GAME_P2_WINNER;
+			}
 		}
 		
-		if (secondRoundResult.equals(DRAW)) // Empate no segundo round, quem ganhou o primeiro, ganha a rodada
+		if (secondRoundResult == ROUND_DRAW) // Empate no segundo round, quem ganhou o primeiro, ganha a rodada
 		{
-			if (firstRoundResult.equals(P1_WINNER))
-				return 1;
-			else if (firstRoundResult.equals(P2_WINNER))
-				return 2;				
+			if (firstRoundResult == ROUND_P1_WINNER)
+			{
+				player1MatchScore += 1;
+				return GAME_P1_WINNER;
+			}
+			else if (firstRoundResult == ROUND_P2_WINNER)
+			{
+				player2MatchScore += 1;
+				return GAME_P2_WINNER;
+			}
 		}
 		
 		// Se algum jogador ganhou dois rounds, ganhou a rodada
-		if (firstRoundResult.equals(P1_WINNER) && secondRoundResult.equals(P1_WINNER))
-			return 1;
-		else if (firstRoundResult.equals(P2_WINNER) && secondRoundResult.equals(P2_WINNER))
-			return 2;
+		if (firstRoundResult == ROUND_P1_WINNER && secondRoundResult == ROUND_P1_WINNER)
+		{
+			player1MatchScore += 1;
+			return GAME_P1_WINNER;
+		}
+		else if (firstRoundResult == ROUND_P2_WINNER && secondRoundResult == ROUND_P2_WINNER)
+		{
+			player2MatchScore += 1;
+			return GAME_P2_WINNER;
+		}
 		
-		return 0; // Ainda não houve vencedor
+		return GAME_DRAW; // Ainda não houve vencedor
 	}
 	
 	// Se não houve vencedor no segundo round, verifica-se novamente no fim da rodada, chamando esse método
@@ -147,13 +157,20 @@ public class TrucoManager {
 		 * Quem vencer o terceiro round, ganha a rodada.
 		 */
 		if (thirdRoundResult.equals(P1_WINNER))
-			return 1;
+		{
+			player1MatchScore += 1;
+			return GAME_P1_WINNER;
+		}
 		else if (thirdRoundResult.equals(P2_WINNER))
-			return 2;
+		{
+			player2MatchScore += 1;
+			return GAME_P2_WINNER;
+		}
 		
-		return 0; // Três empates, ninguém ganha
+		return GAME_DRAW; // Três empates, ninguém ganha
 	}
 	
+	// Verifica quem venceu o round baseado nas cartas de cada jogador
 	public int compareCards(int cardIndexPlayer1, int cardIndexPlayer2)
 	{
 		if
@@ -167,28 +184,27 @@ public class TrucoManager {
 			(
 					handPlayer1[cardIndexPlayer1].suit.ordinal()
 					>
-					handPlayer2[cardIndexPlayer2].suit.ordinal()
-					
+					handPlayer2[cardIndexPlayer2].suit.ordinal()					
 			)
 			{
-				scorePlayer1 = 3 + bonus;
-				return 1;
+				player1GameScore += 1;
+				return ROUND_P1_WINNER;
 			}
 			else
 			{
-				scorePlayer2 = 3 + bonus;
-				return 2;
+				player2GameScore += 1;
+				return ROUND_P2_WINNER;
 			}
 		}
 		else if(handPlayer1[cardIndexPlayer1].cardValue.ordinal() == manilha)
 		{
-			scorePlayer1 = 3 + bonus;
-			return 1;
+			player1GameScore += 1;
+			return ROUND_P1_WINNER;
 		}
 		else if(handPlayer2[cardIndexPlayer2].cardValue.ordinal() == manilha)
 		{
-			scorePlayer2 = 3 + bonus;
-			return 2;
+			player2GameScore += 1;
+			return ROUND_P2_WINNER;
 		}
 		else
 		{
@@ -200,8 +216,8 @@ public class TrucoManager {
 					
 			)
 			{
-				scorePlayer1 = 3 + bonus;
-				return 1;
+				player1GameScore += 1;
+				return ROUND_P1_WINNER;
 			}
 			else if
 			(
@@ -210,13 +226,13 @@ public class TrucoManager {
 					handPlayer2[cardIndexPlayer2].cardValue.ordinal()
 			)
 			{
-				scorePlayer2 = 3 + bonus;
-				return 2;
+				player2GameScore += 1;
+				return ROUND_P2_WINNER;
 			}
 			//empate
 			else
 			{
-				return 0;
+				return ROUND_DRAW;
 			}
 		}
 	}

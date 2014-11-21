@@ -18,10 +18,6 @@ import br.ufms.facom.truco.R;
 
 public class HostGameActivity extends Activity implements OnClickListener{
 	
-	public static final String P1_WINNER = "Player 1 Won";
-	public static final String P2_WINNER = "Player 2 Won";
-	public static final String DRAW = "Draw";
-	
 	private ImageView card1;
 	private ImageView card2;
 	private ImageView card3;
@@ -35,26 +31,25 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	private TextView gameScore;
 	private TextView matchScore;
 	private TrucoManager manager;
-	private int cardPlayedIndex;
-	private int opponentPlayedCardIndex;
-	private int player1GameScore;
-	private int player2GameScore;
-	private int player1MatchScore;
-	private int player2MatchScore;
 	private boolean card1Used;
 	private boolean card2Used;
 	private boolean card3Used;
-	private boolean startedGame;
+	private boolean startedRound;
+	private int roundCounter;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 		
-		init();
+		initViewComponents();
+		
+		newGame();
 	}
-
-	private void init()
+	
+	// Inicia os views da activity e inicia uma nova partida
+	private void initViewComponents()
 	{
 		card1 = (ImageView) findViewById(R.id.imageViewCard1);
 		card2 = (ImageView) findViewById(R.id.imageViewCard2);
@@ -73,35 +68,39 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		card3.setOnClickListener(this);
 		
 		manager = new TrucoManager();
+	}
+
+	// Inicia uma nova rodada e inicializa flags utilizadas durante o processamento do jogo. Chamado a cada nova rodada
+	private void newGame() 
+	{
+		manager.newGame();
+		
+		roundCounter = 1; // Contagem de rounds
+		
+		/*
+		 * Flag que possibilita saber quando calcular o resultado do round.
+		 * Quando o host comeca o round, so eh possivel calcular o resultado
+		 * apos receber a carta do cliente. Caso contrario, deve ser calculado 
+		 * ao escolher (clicar) a carta para enviar ao cliente.
+		 */
+		if (manager.playerTurn == 0)
+			startedRound = true;
+		else
+			startedRound = false;				
+				
 		card1Used = false;
 		card2Used = false;
 		card3Used = false;
 		
-		player1GameScore = 0;
-		player2GameScore = 0;
-		player1MatchScore = 0;
-		player2MatchScore = 0;
-		
-		if (manager.playerTurn == 0)
-			startedGame = true;
-		else
-			startedGame = false;
-		
 		initCards();
 		
+		// Envia os dados do manager para o cliente. Assim o cliente pode inicializar o seu proprio manager com os mesmos dados
 		doSendInitialInfo();
-		
-		if (manager.playerTurn == 0)
-			Toast.makeText(this, "Faça Sua Jogada", Toast.LENGTH_SHORT).show();
-		else
-		{
-			Toast.makeText(this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
-			
-			doReceiveCardInfo();
-		}
 	}
-	
-	private void initCards() {
+
+	// Ajusta as imagens das cartas
+	private void initCards() 
+	{
 		int resourceId;
 		
 		resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
@@ -230,12 +229,33 @@ public class HostGameActivity extends Activity implements OnClickListener{
 
 	private void doSendInitialInfo() {
 		AsyncTask<Void, Void, Boolean> sendInitalInfo = new AsyncTask<Void, Void, Boolean>() {
+			
 			@Override
 			protected Boolean doInBackground(Void... params) {
-				String initialInfo = manager.playerTurn + "," + manager.handPlayer2[0].fileName + "," + manager.handPlayer2[1].fileName + "," + manager.handPlayer2[2].fileName + "," + manager.vira.fileName + ",";
-				try {
+				/*
+				 * Envia:
+				 * playerTurn
+				 * nome das cartas do player1
+				 * nome das cartas do player2
+				 * vira
+				 * manilha
+				 */
+				String initialInfo = manager.playerTurn + "," 
+							       + manager.handPlayer1[0].fileName + "," 
+						           + manager.handPlayer1[1].fileName + "," 
+							       + manager.handPlayer1[2].fileName + ","
+						           + manager.handPlayer2[0].fileName + "," 
+						           + manager.handPlayer2[1].fileName + "," 
+							       + manager.handPlayer2[2].fileName + ","
+							       + manager.vira.fileName + ","
+							       + manager.manilha + ",";
+				
+				try 
+				{
 					BluetoothHelper.getBtSocket().getOutputStream().write(initialInfo.getBytes());
-				} catch (IOException e) {
+				} 
+				catch (IOException e) 
+				{
 					Log.i(getClass().getName(), e.getMessage().toString());
 					return false;
 				}
@@ -245,11 +265,21 @@ public class HostGameActivity extends Activity implements OnClickListener{
 			@Override
 			protected void onPostExecute(Boolean result) {
 				super.onPostExecute(result);
-				if (result == false)
+				if (result == false) // Falha
 				{
 					Toast.makeText(HostGameActivity.this, "Erro de conexão", Toast.LENGTH_LONG).show();
 					BluetoothHelper.closeSocket();
 					finish();
+				}
+				else // Sucesso
+				{
+					if (manager.playerTurn == 0) // Informa ao host que eh sua vez de jogar
+						Toast.makeText(HostGameActivity.this, "Faça Sua Jogada", Toast.LENGTH_SHORT).show();
+					else // Aguarda receber informacoes sobre a carta jogada pelo cliente
+					{
+						Toast.makeText(HostGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
+						doReceiveCardInfo();
+					}
 				}
 			}
 		};

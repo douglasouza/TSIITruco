@@ -19,7 +19,6 @@ public class Deck
 				card = new Card(suit, cardValue);
 				
 				deck.add(card);
-				
 			}
 		}
 		
