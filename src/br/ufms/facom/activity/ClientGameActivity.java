@@ -74,7 +74,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	// Inicializa variáveis locais e flags
 	private void newGame()
 	{
-		setCards(manager.handPlayer2[0].fileName, manager.handPlayer2[0].fileName, manager.handPlayer2[0].fileName, manager.vira.fileName);
+		setCards(manager.handPlayer2[0].fileName, manager.handPlayer2[1].fileName, manager.handPlayer2[2].fileName, manager.vira.fileName);
 		
 		/*
 		 * Contagem de cartas utilizadas pelo host. Usado para
@@ -92,7 +92,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 		 * apos receber a carta do host. Caso contrario, deve ser calculado 
 		 * ao escolher (clicar) a carta para enviar ao host.
 		 */
-		if (manager.playerTurn == 0)
+		if (manager.playerTurn == 2)
 			startedRound = true;
 		else
 			startedRound = false;				
@@ -273,19 +273,20 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	@Override
 	public void onClick(View v) 
 	{
-		if (manager.playerTurn == 1)
+		Log.i("Degug", String.valueOf(manager.playerTurn));
+		if (manager.playerTurn == 2)
 		{
 			switch (v.getId())
 			{
 				case R.id.imageViewCard1:
 					if (!card1Used)
 					{
-						int resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
+						int resourceId = getResources().getIdentifier(manager.handPlayer2[0].fileName, "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
 						card1.setVisibility(ImageView.INVISIBLE);
 						clientCardIndex = 0;
 						card1Used = true;
-						manager.playerTurn = 0;
+						manager.playerTurn = 1;
 						
 						doSendCardInfo(0);
 					}
@@ -293,12 +294,12 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				case R.id.imageViewCard2:
 					if (!card2Used)
 					{
-						int resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
+						int resourceId = getResources().getIdentifier(manager.handPlayer2[1].fileName, "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
 						card2.setVisibility(ImageView.INVISIBLE);
 						clientCardIndex = 1;
 						card2Used = true;
-						manager.playerTurn = 0;
+						manager.playerTurn = 1;
 						
 						doSendCardInfo(1);
 					}
@@ -306,12 +307,12 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				case R.id.imageViewCard3:
 					if (!card3Used)
 					{
-						int resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
+						int resourceId = getResources().getIdentifier(manager.handPlayer2[2].fileName, "drawable", getPackageName());
 						playingCard.setImageDrawable(getResources().getDrawable(resourceId));
 						card3.setVisibility(ImageView.INVISIBLE);
 						clientCardIndex = 2;
 						card3Used = true;
-						manager.playerTurn = 0;
+						manager.playerTurn = 1;
 						
 						doSendCardInfo(2);
 					}
@@ -320,7 +321,9 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 		}
 	}
 	
-	private void doReceiveInitialInfo() {
+	private void doReceiveInitialInfo() 
+	{
+		Log.i("doReceiveInitialInfo", "Entrou");
 		AsyncTask<Void, Void, byte[]> receiveInitialInfo = new AsyncTask<Void, Void, byte[]>() {
 			@Override
 			protected byte[] doInBackground(Void... params) 
@@ -356,7 +359,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 						manager.setClientManager(new String(result, "UTF-8")); 
 						newGame();
 						
-						if (manager.playerTurn == 1) // Informa ao cliente que eh sua vez de jogar
+						if (manager.playerTurn == 2) // Informa ao cliente que eh sua vez de jogar
 							Toast.makeText(ClientGameActivity.this, "Faça Sua Jogada", Toast.LENGTH_SHORT).show();
 						else // Aguarda receber informacoes sobre a carta jogada pelo host
 						{
@@ -387,6 +390,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	
 	private void doSendCardInfo(int cardIndex) 
 	{
+		Log.i("doSendCardInfo", "Entrou");
 		AsyncTask<Integer, Void, Boolean> sendCardInfo = new AsyncTask<Integer, Void, Boolean>() {
 			
 			@Override
@@ -440,6 +444,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	
 	private void doReceiveCardInfo()
 	{
+		Log.i("doReceiveCardInfo", "Entrou");
 		AsyncTask<Void, Void, byte[]> receiveCardInfo = new AsyncTask<Void, Void, byte[]>() {
 			
 			@Override
@@ -468,17 +473,20 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				super.onPostExecute(result);
 				if (result == null) // Falha
 				{
+					Log.i("doReceiveCardInfo", "Falha");
 					Toast.makeText(ClientGameActivity.this, "Falha de conexão. Jogo encerrado!", Toast.LENGTH_LONG).show();
 					BluetoothHelper.closeSocket();
 					finish();
 				} 
 				else // Sucesso
 				{
+					Log.i("doReceiveCardInfo", "Sucesso");
 					try 
 					{
 						String temp = new String(result, "UTF-8");
 						String[] cardIndex = temp.split(",");
 						hostCardIndex = Integer.parseInt(cardIndex[0]);
+						Log.i("doReceiveCardInfo", "HostCardIndex: " + String.valueOf(hostCardIndex));
 						setOpponentPlayingCard();
 					} 
 					catch (UnsupportedEncodingException e) 
@@ -491,12 +499,18 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 					
 					if (startedRound)
 					{
+						Log.i("doReceiveCardInfo", "VerifyWinner");
 						verifyWinner();
+					}
+					else
+					{
+						Log.i("doReceiveCardInfo", "PlayerTurn");
+						manager.playerTurn = 2;
 					}
 				}
 			}
 		};
-		
+		Log.i("doReceiveCardInfo", "Execute");
 		receiveCardInfo.execute();
 	}
 }

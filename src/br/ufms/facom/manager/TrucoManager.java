@@ -58,6 +58,9 @@ public class TrucoManager {
 		
 		player1MatchScore = 0;
 		player2MatchScore = 0;
+		
+		handPlayer1 = new Card[3];
+		handPlayer2 = new Card[3];
 	}
 	
 	// Nova Rodada
@@ -67,9 +70,6 @@ public class TrucoManager {
 		
 		player1GameScore = 0;
 		player1GameScore = 0;
-		
-		handPlayer1 = new Card[3];
-		handPlayer2 = new Card[3];
 		
 		for(int i = 0; i < 3; i++)
 		{
@@ -91,7 +91,7 @@ public class TrucoManager {
 		
 		// Define quem começa a rodada aleatoriamente
 		Random rand = new Random();
-		playerTurn = rand.nextInt(2);
+		playerTurn = rand.nextInt(2) + 1;
 	}
 	
 	// Aumenta o valor da rodada. (Truco)

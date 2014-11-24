@@ -93,7 +93,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		 * apos receber a carta do cliente. Caso contrario, deve ser calculado 
 		 * ao escolher (clicar) a carta para enviar ao cliente.
 		 */
-		if (manager.playerTurn == 0)
+		if (manager.playerTurn == 1)
 			startedRound = true;
 		else
 			startedRound = false;				
@@ -281,7 +281,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	@Override
 	public void onClick(View v) 
 	{
-		if (manager.playerTurn == 0)
+		if (manager.playerTurn == 1)
 		{
 			switch (v.getId())
 			{
@@ -293,7 +293,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						card1.setVisibility(ImageView.INVISIBLE);
 						hostCardIndex = 0;
 						card1Used = true;
-						manager.playerTurn = 1;
+						manager.playerTurn = 2;
 						
 						doSendCardInfo(0);
 					}
@@ -306,7 +306,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						card2.setVisibility(ImageView.INVISIBLE);
 						hostCardIndex = 1;
 						card2Used = true;
-						manager.playerTurn = 1;
+						manager.playerTurn = 2;
 						
 						doSendCardInfo(1);
 					}
@@ -319,7 +319,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						card3.setVisibility(ImageView.INVISIBLE);
 						hostCardIndex = 2;
 						card3Used = true;
-						manager.playerTurn = 1;
+						manager.playerTurn = 2;
 						
 						doSendCardInfo(2);
 					}
@@ -330,6 +330,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	
 	private void doSendInitialInfo() 
 	{
+		Log.i("doSendInitialInfo", "Entrou");
 		AsyncTask<Void, Void, Boolean> sendInitalInfo = new AsyncTask<Void, Void, Boolean>() {
 			
 			@Override
@@ -343,20 +344,20 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				 * manilha
 				 */
 				String initialInfo = manager.playerTurn + "," 
-							       + manager.handPlayer1[0].suit + ","
-							       + manager.handPlayer1[0].cardValue + ","
-							       + manager.handPlayer1[1].suit + ","
-							       + manager.handPlayer1[1].cardValue + ","
-							       + manager.handPlayer1[2].suit + ","
-							       + manager.handPlayer1[2].cardValue + ","
-							       + manager.handPlayer2[0].suit + ","
-							       + manager.handPlayer2[0].cardValue + ","
-							       + manager.handPlayer2[1].suit + ","
-							       + manager.handPlayer2[1].cardValue + ","
-							       + manager.handPlayer2[2].suit + ","
-							       + manager.handPlayer2[2].cardValue + ","
-							       + manager.vira.suit + ","
-							       + manager.vira.cardValue + ","
+							       + manager.handPlayer1[0].suit.ordinal() + ","
+							       + manager.handPlayer1[0].cardValue.ordinal() + ","
+							       + manager.handPlayer1[1].suit.ordinal() + ","
+							       + manager.handPlayer1[1].cardValue.ordinal() + ","
+							       + manager.handPlayer1[2].suit.ordinal() + ","
+							       + manager.handPlayer1[2].cardValue.ordinal() + ","
+							       + manager.handPlayer2[0].suit.ordinal() + ","
+							       + manager.handPlayer2[0].cardValue.ordinal() + ","
+							       + manager.handPlayer2[1].suit.ordinal() + ","
+							       + manager.handPlayer2[1].cardValue.ordinal() + ","
+							       + manager.handPlayer2[2].suit.ordinal() + ","
+							       + manager.handPlayer2[2].cardValue.ordinal() + ","
+							       + manager.vira.suit.ordinal() + ","
+							       + manager.vira.cardValue.ordinal() + ","
 							       + manager.manilha + ",";
 				
 				try 
@@ -382,7 +383,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				}
 				else // Sucesso
 				{
-					if (manager.playerTurn == 0) // Informa ao host que eh sua vez de jogar
+					if (manager.playerTurn == 1) // Informa ao host que eh sua vez de jogar
 						Toast.makeText(HostGameActivity.this, "Faça Sua Jogada", Toast.LENGTH_SHORT).show();
 					else // Aguarda receber informacoes sobre a carta jogada pelo cliente
 					{
@@ -398,6 +399,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	
 	private void doSendCardInfo(int cardIndex) 
 	{
+		Log.i("doSendCardInfo", "Entrou");
 		AsyncTask<Integer, Void, Boolean> sendCardInfo = new AsyncTask<Integer, Void, Boolean>() {
 			
 			@Override
@@ -451,6 +453,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	
 	private void doReceiveCardInfo()
 	{
+		Log.i("doReceiveCardInfo", "Entrou");
 		AsyncTask<Void, Void, byte[]> receiveCardInfo = new AsyncTask<Void, Void, byte[]>() {
 			
 			@Override
@@ -504,6 +507,8 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					{
 						verifyWinner();
 					}
+					else
+						manager.playerTurn = 1;
 				}
 			}
 		};
