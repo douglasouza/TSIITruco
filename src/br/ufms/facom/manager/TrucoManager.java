@@ -43,7 +43,7 @@ public class TrucoManager {
 	// Valor dessa rodada com relacao a partida. Default = 1. Incrementado com chamadas de truco
 	public int gameValue;
 	
-	// Indica de quem é a vez de jogar
+	// Indica de quem é a vez de jogar 1 = host, 2 = cliente
 	public int playerTurn;
 	
 	// Cartas de cada jogador
@@ -264,5 +264,27 @@ public class TrucoManager {
 				return ROUND_DRAW;
 			}
 		}
+	}
+	
+	// Metodo utilizado pelo cliente para inicializar os dados do manager com os dados iniciais recebidos do host
+	public void setClientManager(String initialInfo)
+	{
+		String[] temp = initialInfo.split(",");
+		
+		this.gameValue = 1;		
+		this.player1GameScore = 0;
+		this.player1GameScore = 0;
+		this.playerTurn = Integer.parseInt(temp[0]);
+		
+		this.handPlayer1[0] = new Card(Suit.values()[Integer.parseInt(temp[1])], CardValue.values()[Integer.parseInt(temp[2])]);
+		this.handPlayer1[1] = new Card(Suit.values()[Integer.parseInt(temp[3])], CardValue.values()[Integer.parseInt(temp[4])]);
+		this.handPlayer1[2] = new Card(Suit.values()[Integer.parseInt(temp[5])], CardValue.values()[Integer.parseInt(temp[6])]);
+		
+		this.handPlayer2[0] = new Card(Suit.values()[Integer.parseInt(temp[7])], CardValue.values()[Integer.parseInt(temp[8])]);
+		this.handPlayer2[1] = new Card(Suit.values()[Integer.parseInt(temp[9])], CardValue.values()[Integer.parseInt(temp[10])]);
+		this.handPlayer2[2] = new Card(Suit.values()[Integer.parseInt(temp[11])], CardValue.values()[Integer.parseInt(temp[12])]);
+		
+		this.vira = new Card(Suit.values()[Integer.parseInt(temp[13])], CardValue.values()[Integer.parseInt(temp[14])]);
+		this.manilha = Integer.parseInt(temp[15]);
 	}
 }
