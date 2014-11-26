@@ -70,9 +70,9 @@ public final class R {
         public static final int two_of_spades=0x7f02002d;
     }
     public static final class id {
-        public static final int btnCreateGame=0x7f070013;
-        public static final int btnFindGame=0x7f070014;
-        public static final int btnTruco=0x7f07000c;
+        public static final int btnCreateGame=0x7f070016;
+        public static final int btnFindGame=0x7f070017;
+        public static final int btnTruco=0x7f07000d;
         public static final int imageViewCard1=0x7f070003;
         public static final int imageViewCard2=0x7f070006;
         public static final int imageViewCard3=0x7f070007;
@@ -81,16 +81,19 @@ public final class R {
         public static final int imageViewOpponentCard3=0x7f070002;
         public static final int imageViewOpponentPlayingCard=0x7f070005;
         public static final int imageViewPlayingCard=0x7f070009;
-        public static final int imageViewSuits=0x7f070012;
+        public static final int imageViewSuits=0x7f070015;
         public static final int imageViewVira=0x7f070004;
-        public static final int list=0x7f07000e;
+        public static final int linearLayout1=0x7f07000a;
+        public static final int list=0x7f070011;
         public static final int textView3=0x7f070008;
-        public static final int txtDeviceName=0x7f070010;
-        public static final int txtOpponentDeviceName=0x7f070011;
-        public static final int txtSearchingDevices=0x7f07000d;
-        public static final int txtViewGameScore=0x7f07000b;
-        public static final int txtViewMatchScore=0x7f07000a;
-        public static final int txtWaitingPlayer=0x7f07000f;
+        public static final int txtDeviceName=0x7f070013;
+        public static final int txtOpponentDeviceName=0x7f070014;
+        public static final int txtSearchingDevices=0x7f070010;
+        public static final int txtViewPlayer1GameScore=0x7f07000e;
+        public static final int txtViewPlayer1MatchScore=0x7f07000b;
+        public static final int txtViewPlayer2GameScore=0x7f07000f;
+        public static final int txtViewPlayer2MatchScore=0x7f07000c;
+        public static final int txtWaitingPlayer=0x7f070012;
     }
     public static final class layout {
         public static final int activity_game=0x7f030000;
@@ -103,17 +106,18 @@ public final class R {
         public static final int create_game=0x7f050001;
         public static final int device_name=0x7f050002;
         public static final int find_game=0x7f050003;
-        public static final int initial_score=0x7f050004;
-        public static final int searching_devices=0x7f05000a;
-        public static final int title_activity_client_game=0x7f05000e;
-        public static final int title_activity_host_game=0x7f05000d;
-        public static final int title_activity_join_game=0x7f050005;
-        public static final int title_activity_lobby=0x7f050006;
-        public static final int title_activity_truco=0x7f050007;
-        public static final int waiting=0x7f050009;
-        public static final int waiting_invite=0x7f05000c;
-        public static final int waiting_player=0x7f05000b;
-        public static final int your_device_name=0x7f050008;
+        public static final int searching_devices=0x7f05000b;
+        public static final int title_activity_client_game=0x7f05000f;
+        public static final int title_activity_host_game=0x7f05000e;
+        public static final int title_activity_join_game=0x7f050006;
+        public static final int title_activity_lobby=0x7f050007;
+        public static final int title_activity_truco=0x7f050008;
+        public static final int waiting=0x7f05000a;
+        public static final int waiting_invite=0x7f05000d;
+        public static final int waiting_player=0x7f05000c;
+        public static final int x=0x7f050005;
+        public static final int your_device_name=0x7f050009;
+        public static final int zero=0x7f050004;
     }
     public static final class style {
         /** 

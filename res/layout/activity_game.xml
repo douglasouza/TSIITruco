@@ -81,27 +81,36 @@
         android:textColor="@android:color/white"
         android:textSize="30sp" />
 
-    <TextView
-        android:id="@+id/txtViewMatchScore"
+    <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="@string/initial_score"
-        android:textColor="@android:color/white"
-        android:textSize="40sp" />
+        android:layout_marginTop="20dp" >
 
-    <TextView
-        android:id="@+id/txtViewGameScore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/txtViewMatchScore"
-        android:layout_alignRight="@+id/txtViewMatchScore"
-        android:layout_below="@+id/txtViewMatchScore"
-        android:gravity="center"
-        android:text="@string/initial_score"
-        android:textColor="@android:color/white"
-        android:textSize="32sp" />
+        <TextView
+            android:id="@+id/txtViewPlayer1MatchScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zero"
+            android:textColor="@android:color/white"
+            android:textSize="40sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x"
+            android:textColor="@android:color/white"
+            android:textSize="40sp" />
+
+        <TextView
+            android:id="@+id/txtViewPlayer2MatchScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zero"
+            android:textColor="@android:color/white"
+            android:textSize="40sp" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/imageViewPlayingCard"
@@ -131,5 +140,35 @@
         android:layout_alignRight="@+id/imageViewVira"
         android:layout_alignTop="@+id/imageViewCard3"
         android:text="@string/app_name" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_centerHorizontal="true" >
+
+        <TextView
+            android:id="@+id/txtViewPlayer1GameScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zero"
+            android:textColor="@android:color/white"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x"
+            android:textColor="@android:color/white"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/txtViewPlayer2GameScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zero"
+            android:textColor="@android:color/white"
+            android:textSize="32sp" />
+    </LinearLayout>
 
 </RelativeLayout>

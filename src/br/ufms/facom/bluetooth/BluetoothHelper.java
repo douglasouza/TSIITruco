@@ -74,15 +74,18 @@ public class BluetoothHelper {
 	public void makeItVisible()
 	{
 		 Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-	     discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+	     discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 60);
 	     activity.startActivityForResult(discoverableIntent, REQUEST_DISCOVERABLE_BT);
 	}
 
 	public static void closeSocket()
 	{
 		try {
-			btSocket.close();
-			btSocket = null;
+			if (btSocket != null)
+			{
+				btSocket.close();
+				btSocket = null;
+			}
 		} catch (IOException e) { }
 	}
 }

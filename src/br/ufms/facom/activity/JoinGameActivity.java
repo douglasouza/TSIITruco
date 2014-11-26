@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
@@ -74,8 +75,8 @@ public class JoinGameActivity extends Activity {
 	
 	@Override
 	protected void onRestart() {
-		finish();
 		super.onRestart();
+		finish();
 	}
 	
 	@Override
@@ -102,7 +103,9 @@ public class JoinGameActivity extends Activity {
 			{
 				final BluetoothDevice btDevice = btDeviceList.get(position);
 				
-				Builder waitDialog = new Builder(JoinGameActivity.this);
+				ProgressDialog.Builder waitDialog = new Builder(JoinGameActivity.this);
+				waitDialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
+				waitDialog.setCancelable(false);
 				waitDialog.setTitle("Aguarde...");
 				waitDialog.show();
 				

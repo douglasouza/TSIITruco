@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="14"
         android:targetSdkVersion="20" />
 
     <application
@@ -40,11 +40,6 @@
             android:name="br.ufms.facom.activity.HostGameActivity"
             android:label="@string/title_activity_host_game"
             android:screenOrientation="landscape" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="br.ufms.facom.activity.ClientGameActivity"

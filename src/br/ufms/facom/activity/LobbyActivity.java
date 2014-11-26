@@ -102,8 +102,8 @@ public class LobbyActivity extends Activity {
 	
 	@Override
 	protected void onRestart() {
-		finish();
 		super.onRestart();
+		finish();
 	}
 	
 	private void init() 

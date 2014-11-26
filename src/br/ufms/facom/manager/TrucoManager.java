@@ -2,6 +2,8 @@ package br.ufms.facom.manager;
 
 import java.util.Random;
 
+import android.util.Log;
+
 public class TrucoManager {
 	
 	public static final String P1_WINNER = "P1WIN";
@@ -53,9 +55,6 @@ public class TrucoManager {
 	// Nova Partida
 	public TrucoManager()
 	{
-		deck = new Deck();
-		deck.shuffleDeck();
-		
 		player1MatchScore = 0;
 		player2MatchScore = 0;
 		
@@ -66,10 +65,13 @@ public class TrucoManager {
 	// Nova Rodada
 	public void newGame()
 	{
+		deck = new Deck();
+		deck.shuffleDeck();
+		
 		gameValue = 1;
 		
 		player1GameScore = 0;
-		player1GameScore = 0;
+		player2GameScore = 0;
 		
 		for(int i = 0; i < 3; i++)
 		{
@@ -110,12 +112,12 @@ public class TrucoManager {
 		{
 			if (secondRoundResult == ROUND_P1_WINNER)
 			{
-				player1MatchScore += 1;
+				player1MatchScore += gameValue;
 				return GAME_P1_WINNER;
 			}
 			else if (secondRoundResult == ROUND_P2_WINNER)
 			{
-				player2MatchScore += 1;
+				player2MatchScore += gameValue;
 				return GAME_P2_WINNER;
 			}
 		}
@@ -124,12 +126,12 @@ public class TrucoManager {
 		{
 			if (firstRoundResult == ROUND_P1_WINNER)
 			{
-				player1MatchScore += 1;
+				player1MatchScore += gameValue;
 				return GAME_P1_WINNER;
 			}
 			else if (firstRoundResult == ROUND_P2_WINNER)
 			{
-				player2MatchScore += 1;
+				player2MatchScore += gameValue;
 				return GAME_P2_WINNER;
 			}
 		}
@@ -137,12 +139,12 @@ public class TrucoManager {
 		// Se algum jogador ganhou dois rounds, ganhou a rodada
 		if (firstRoundResult == ROUND_P1_WINNER && secondRoundResult == ROUND_P1_WINNER)
 		{
-			player1MatchScore += 1;
+			player1MatchScore += gameValue;
 			return GAME_P1_WINNER;
 		}
 		else if (firstRoundResult == ROUND_P2_WINNER && secondRoundResult == ROUND_P2_WINNER)
 		{
-			player2MatchScore += 1;
+			player2MatchScore += gameValue;
 			return GAME_P2_WINNER;
 		}
 		
@@ -159,12 +161,14 @@ public class TrucoManager {
 		 */
 		if (thirdRoundResult == ROUND_P1_WINNER)
 		{
-			player1MatchScore += 1;
+			Log.i("match1", "Entrou");
+			player1MatchScore += gameValue;
 			return GAME_P1_WINNER;
 		}
 		else if (thirdRoundResult == ROUND_P2_WINNER)
 		{
-			player2MatchScore += 1;
+			Log.i("match1", "Entrou2");
+			player2MatchScore += gameValue;
 			return GAME_P2_WINNER;
 		}
 		

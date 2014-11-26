@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +21,10 @@ import br.ufms.facom.truco.R;
 
 public class HostGameActivity extends Activity implements OnClickListener{
 	
+	private AlertDialog.Builder exitAlert;
+	private AlertDialog.Builder trucoAlert;
+	private AlertDialog.Builder genericAlert;
+	private Button btnTruco;
 	private ImageView card1;
 	private ImageView card2;
 	private ImageView card3;
@@ -27,8 +34,10 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	private ImageView playingCard;
 	private ImageView opponentPlayingCard;
 	private ImageView vira;
-	private TextView gameScore;
-	private TextView matchScore;
+	private TextView p1GameScore;
+	private TextView p2GameScore;
+	private TextView p1MatchScore;
+	private TextView p2MatchScore;
 	private TrucoManager manager;
 	private boolean card1Used;
 	private boolean card2Used;
@@ -55,6 +64,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 	// Inicializa os views da activity
 	private void initViewComponents()
 	{
+		btnTruco = (Button) findViewById(R.id.btnTruco);
 		card1 = (ImageView) findViewById(R.id.imageViewCard1);
 		card2 = (ImageView) findViewById(R.id.imageViewCard2);
 		card3 = (ImageView) findViewById(R.id.imageViewCard3);
@@ -64,66 +74,199 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		playingCard = (ImageView) findViewById(R.id.imageViewPlayingCard);
 		opponentPlayingCard = (ImageView) findViewById(R.id.imageViewOpponentPlayingCard);
 		vira = (ImageView) findViewById(R.id.imageViewVira);
-		gameScore = (TextView) findViewById(R.id.txtViewGameScore);
-		matchScore = (TextView) findViewById(R.id.txtViewMatchScore);
+		p1GameScore = (TextView) findViewById(R.id.txtViewPlayer1GameScore);
+		p2GameScore = (TextView) findViewById(R.id.txtViewPlayer2GameScore);
+		p2GameScore.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+		p1MatchScore = (TextView) findViewById(R.id.txtViewPlayer1MatchScore);
+		p2MatchScore = (TextView) findViewById(R.id.txtViewPlayer2MatchScore);
+		p2MatchScore.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
 		
+		btnTruco.setOnClickListener(this);
 		card1.setOnClickListener(this);
 		card2.setOnClickListener(this);
 		card3.setOnClickListener(this);
+		
+		genericAlert = new AlertDialog.Builder(HostGameActivity.this);
+		genericAlert.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
+		
+		genericAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() 
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				BluetoothHelper.closeSocket();
+				finish();
+			}
+		});
+		
+		exitAlert = new AlertDialog.Builder(HostGameActivity.this);
+		exitAlert.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
+		exitAlert.setTitle("Atenção!");
+		exitAlert.setMessage("Você Realmente Deseja Sair do Jogo?");
+		
+		exitAlert.setPositiveButton("Sim", new DialogInterface.OnClickListener() 
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				BluetoothHelper.closeSocket();
+				finish();
+			}
+		});
+		
+		exitAlert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() 
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				// Não faz nada
+			}
+		});
+		
+		trucoAlert = new AlertDialog.Builder(HostGameActivity.this);
+		trucoAlert.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
+		
+		trucoAlert.setPositiveButton("Aumentar", new DialogInterface.OnClickListener() 
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				manager.increaseGameValue();
+				manager.playerTurn = 2;
+				doSendInfo(10);
+			}
+		});
+		
+		trucoAlert.setNeutralButton("Aceitar", new DialogInterface.OnClickListener() 
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				manager.playerTurn = 2;
+				doSendInfo(9);
+			}
+		});
+		
+		trucoAlert.setNegativeButton("Correr", new DialogInterface.OnClickListener() 
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				manager.playerTurn = 2;
+				doSendInfo(8);
+			}
+		});
 	}
 
 	// Inicia uma nova rodada e inicializa flags utilizadas durante o processamento do jogo. Chamado a cada nova rodada
 	private void newGame() 
 	{
-		manager.newGame();
-		
-		/*
-		 * Contagem de cartas utilizadas pelo cliente. Usado para
-		 * esconder as cartas do cliente, dependendo do numero utilizado.
-		 */
-		player2CardsUsed = 0;
-		roundCount = 1; // Contagem de rounds
-		
-		hostCardIndex = -1; // Index no vetor handPlayer1, referente a carta jogada pelo host
-		clientCardIndex = -1; // Index no vetor handPlayer2, referente a carta jogada pelo client
-		
-		/*
-		 * Flag que possibilita saber quando calcular o resultado do round.
-		 * Quando o host comeca o round, so eh possivel calcular o resultado
-		 * apos receber a carta do cliente. Caso contrario, deve ser calculado 
-		 * ao escolher (clicar) a carta para enviar ao cliente.
-		 */
-		if (manager.playerTurn == 1)
-			startedRound = true;
+		if (manager.player1MatchScore == 12) // Host venceu a partida
+		{
+			genericAlert.setTitle("Partida Encerrada!");
+			genericAlert.setMessage("Você Venceu a Partida :D!");
+			genericAlert.show();
+		}
+		else if (manager.player2MatchScore == 12) // Cliente venceu a partida
+		{
+			genericAlert.setTitle("Partida Encerrada!");
+			genericAlert.setMessage("Você Perdeu a Partida D:!");
+			genericAlert.show();
+		}
 		else
-			startedRound = false;				
-				
-		card1Used = false;
-		card2Used = false;
-		card3Used = false;
-		
-		initCards();
-		
-		// Envia os dados do manager para o cliente. Assim o cliente pode inicializar o seu proprio manager com os mesmos dados
-		doSendInitialInfo();
+		{
+			Log.i("NewGame", "Entrou");
+			manager.newGame();
+			/*
+			 * Contagem de cartas utilizadas pelo cliente. Usado para
+			 * esconder as cartas do cliente, dependendo do numero utilizado.
+			 */
+			player2CardsUsed = 0;
+			roundCount = 1; // Contagem de rounds
+			
+			hostCardIndex = -1; // Index no vetor handPlayer1, referente a carta jogada pelo host
+			clientCardIndex = -1; // Index no vetor handPlayer2, referente a carta jogada pelo client
+			
+			/*
+			 * Flag que possibilita saber quando calcular o resultado do round.
+			 * Quando o host comeca o round, so eh possivel calcular o resultado
+			 * apos receber a carta do cliente. Caso contrario, deve ser calculado 
+			 * ao escolher (clicar) a carta para enviar ao cliente.
+			 */
+			if (manager.playerTurn == 1)
+				startedRound = true;
+			else
+				startedRound = false;				
+					
+			card1Used = false;
+			card2Used = false;
+			card3Used = false;
+			
+			Log.i("NewGame", "Started Round:" + startedRound);
+			
+			initCards();
+			
+			// Inicializa o placar da rodada
+			p1GameScore.setText(String.valueOf(manager.player1GameScore));
+			p2GameScore.setText(String.valueOf(manager.player2GameScore));
+			
+			// TODO mao de onze
+			
+			// Envia os dados do manager para o cliente. Assim o cliente pode inicializar o seu proprio manager com os mesmos dados
+			doSendInitialInfo();
+		}
 	}
 
 	// Ajusta as imagens das cartas
 	private void initCards() 
 	{
 		int resourceId;
-		
-		resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
-		card1.setImageDrawable(getResources().getDrawable(resourceId));
-		
-		resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
-		card2.setImageDrawable(getResources().getDrawable(resourceId));
-		
-		resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
-		card3.setImageDrawable(getResources().getDrawable(resourceId));
 
-		resourceId = getResources().getIdentifier(manager.vira.fileName, "drawable", getPackageName());
-		vira.setImageDrawable(getResources().getDrawable(resourceId));
+		if (manager.player1MatchScore == 11 && manager.player2MatchScore == 11) // Mão de ferro, jogadores recebem as cartas cobertas
+		{
+			resourceId = getResources().getIdentifier("decks_back", "drawable", getPackageName());
+			
+			card1.setImageDrawable(getResources().getDrawable(resourceId));
+			card1.setVisibility(ImageView.VISIBLE);
+			
+			card2.setImageDrawable(getResources().getDrawable(resourceId));
+			card2.setVisibility(ImageView.VISIBLE);
+			
+			card3.setImageDrawable(getResources().getDrawable(resourceId));
+			card3.setVisibility(ImageView.VISIBLE);
+			
+			vira.setImageDrawable(getResources().getDrawable(resourceId));
+			vira.setVisibility(ImageView.VISIBLE);
+			
+			playingCard.setImageDrawable(getResources().getDrawable(resourceId));
+			opponentPlayingCard.setImageDrawable(getResources().getDrawable(resourceId));
+		}
+		else
+		{
+			resourceId = getResources().getIdentifier(manager.handPlayer1[0].fileName, "drawable", getPackageName());
+			card1.setImageDrawable(getResources().getDrawable(resourceId));
+			card1.setVisibility(ImageView.VISIBLE);
+			
+			resourceId = getResources().getIdentifier(manager.handPlayer1[1].fileName, "drawable", getPackageName());
+			card2.setImageDrawable(getResources().getDrawable(resourceId));
+			card2.setVisibility(ImageView.VISIBLE);
+			
+			resourceId = getResources().getIdentifier(manager.handPlayer1[2].fileName, "drawable", getPackageName());
+			card3.setImageDrawable(getResources().getDrawable(resourceId));
+			card3.setVisibility(ImageView.VISIBLE);
+			
+			resourceId = getResources().getIdentifier(manager.vira.fileName, "drawable", getPackageName());
+			vira.setImageDrawable(getResources().getDrawable(resourceId));
+			vira.setVisibility(ImageView.VISIBLE);
+			
+			resourceId = getResources().getIdentifier("decks_back", "drawable", getPackageName());
+			playingCard.setImageDrawable(getResources().getDrawable(resourceId));
+			opponentPlayingCard.setImageDrawable(getResources().getDrawable(resourceId));
+			
+			opponentCard1.setVisibility(ImageView.VISIBLE);
+			opponentCard2.setVisibility(ImageView.VISIBLE);
+			opponentCard3.setVisibility(ImageView.VISIBLE);
+		}
 	}
 	
 	private void setOpponentPlayingCard()
@@ -177,10 +320,15 @@ public class HostGameActivity extends Activity implements OnClickListener{
 			}
 			
 			// Atualiza o placar da rodada
-			gameScore.setText(manager.player1GameScore + " x " + manager.player2GameScore);
+			p1GameScore.setText(String.valueOf(manager.player1GameScore));
+			p2GameScore.setText(String.valueOf(manager.player2GameScore));
 			
-			// Incremena o contador de rounds
+			// Incrementa o contador de rounds
 			roundCount++;
+			
+			// Se o cliente ganhou, entao ele comeca o prox round. Portanto deve-se esperar sua jogada
+			if (manager.playerTurn == 2)
+				doReceiveInfo();
 		}
 		else if (roundCount == 2)
 		{
@@ -213,7 +361,8 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				Toast.makeText(HostGameActivity.this, "Empate!", Toast.LENGTH_SHORT).show();
 			}
 
-			gameScore.setText(manager.player1GameScore + " x " + manager.player2GameScore);
+			p1GameScore.setText(String.valueOf(manager.player1GameScore));
+			p2GameScore.setText(String.valueOf(manager.player2GameScore));
 			
 			// Verifica se ja existe um vencedor
 			int winner = manager.secondRoundWinner();			
@@ -221,16 +370,22 @@ public class HostGameActivity extends Activity implements OnClickListener{
 			{
 				// Se ainda nao existe vencedor, incrementa o contador de rounds
 				roundCount++;
+				
+				// Se o cliente ganhou, entao ele comeca o prox round. Portanto deve-se esperar sua jogada
+				if (manager.playerTurn == 2)
+					doReceiveInfo();
 			}
 			else if (winner == TrucoManager.GAME_P1_WINNER)
 			{
-				matchScore.setText(manager.player1MatchScore + " x " + manager.player2MatchScore);
+				p1MatchScore.setText(String.valueOf(manager.player1MatchScore));
+				p2MatchScore.setText(String.valueOf(manager.player2MatchScore));
 				Toast.makeText(HostGameActivity.this, "Você Venceu a Rodada!", Toast.LENGTH_SHORT).show();
 				newGame();
 			}
 			else if (winner == TrucoManager.GAME_P2_WINNER)
 			{
-				matchScore.setText(manager.player1MatchScore + " x " + manager.player2MatchScore);
+				p1MatchScore.setText(String.valueOf(manager.player1MatchScore));
+				p2MatchScore.setText(String.valueOf(manager.player2MatchScore));
 				Toast.makeText(HostGameActivity.this, "Você Perdeu a Rodada!", Toast.LENGTH_SHORT).show();
 				newGame();
 			}
@@ -245,37 +400,37 @@ public class HostGameActivity extends Activity implements OnClickListener{
 			else if (manager.thirdRoundResult == TrucoManager.ROUND_DRAW)
 				Toast.makeText(HostGameActivity.this, "Empate!", Toast.LENGTH_SHORT).show();
 			
-			gameScore.setText(manager.player1GameScore + " x " + manager.player2GameScore);
+			p1GameScore.setText(String.valueOf(manager.player1GameScore));
+			p2GameScore.setText(String.valueOf(manager.player2GameScore));
 			
-			if (manager.gameResult() == TrucoManager.GAME_DRAW)
+			int result = manager.gameResult();
+			
+			if (result == TrucoManager.GAME_DRAW)
 			{
-				matchScore.setText(manager.player1MatchScore + " x " + manager.player2MatchScore);
 				Toast.makeText(HostGameActivity.this, "A Rodada Terminou Empatada!", Toast.LENGTH_SHORT).show();
 				newGame();
 			}
-			else if (manager.gameResult() == TrucoManager.GAME_P1_WINNER)
+			else if (result == TrucoManager.GAME_P1_WINNER)
 			{
-				matchScore.setText(manager.player1MatchScore + " x " + manager.player2MatchScore);
+				p1MatchScore.setText(String.valueOf(manager.player1MatchScore));
+				p2MatchScore.setText(String.valueOf(manager.player2MatchScore));
 				Toast.makeText(HostGameActivity.this, "Você Venceu a Rodada!", Toast.LENGTH_SHORT).show();
 				newGame();
 			}
-			else if (manager.gameResult() == TrucoManager.GAME_P2_WINNER)
+			else if (result == TrucoManager.GAME_P2_WINNER)
 			{
-				matchScore.setText(manager.player1MatchScore + " x " + manager.player2MatchScore);
+				p1MatchScore.setText(String.valueOf(manager.player1MatchScore));
+				p2MatchScore.setText(String.valueOf(manager.player2MatchScore));
 				Toast.makeText(HostGameActivity.this, "Você Perdeu a Rodada!", Toast.LENGTH_SHORT).show();
 				newGame();
 			}
 		}
-		
-		// Se o cliente ganhou, entao ele comeca o prox round. Portanto deve-se esperar sua jogada
-		if (manager.playerTurn == 2)
-			doReceiveCardInfo();
 	}
 	
 	@Override
-	public void onBackPressed() {
-		BluetoothHelper.closeSocket();
-		super.onBackPressed();
+	public void onBackPressed() 
+	{
+		exitAlert.show();
 	}
 
 	@Override
@@ -295,7 +450,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						card1Used = true;
 						manager.playerTurn = 2;
 						
-						doSendCardInfo(0);
+						doSendInfo(0);
 					}
 					break;
 				case R.id.imageViewCard2:
@@ -308,7 +463,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						card2Used = true;
 						manager.playerTurn = 2;
 						
-						doSendCardInfo(1);
+						doSendInfo(1);
 					}
 					break;
 				case R.id.imageViewCard3:
@@ -321,7 +476,15 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						card3Used = true;
 						manager.playerTurn = 2;
 						
-						doSendCardInfo(2);
+						doSendInfo(2);
+					}
+					break;
+				case R.id.btnTruco:
+					if (manager.gameValue < 12)
+					{
+						manager.increaseGameValue();
+						manager.playerTurn = 2;
+						doSendInfo(7);
 					}
 					break;
 			}
@@ -388,7 +551,7 @@ public class HostGameActivity extends Activity implements OnClickListener{
 					else // Aguarda receber informacoes sobre a carta jogada pelo cliente
 					{
 						Toast.makeText(HostGameActivity.this, "Turno do Oponente", Toast.LENGTH_SHORT).show();
-						doReceiveCardInfo();
+						doReceiveInfo();
 					}
 				}
 			}
@@ -397,28 +560,22 @@ public class HostGameActivity extends Activity implements OnClickListener{
 		sendInitalInfo.execute();
 	}
 	
-	private void doSendCardInfo(int cardIndex) 
+	private void doSendInfo(final int sendCode) 
 	{
+		/*
+		 * Dados que podem ser enviados:
+		 * 0,1,2: referentes a posicao da carta jogada pelo host no vetor handPlayer1 do manager
+		 * 7: pedido de truco
+		 * 8: recusa do pedido de truco ou de aumento da aposta do cliente
+		 * 9: aceitação do pedido de truco ou de aumento da aposta do cliente
+		 * 10: aumento da aposta
+		 */
 		Log.i("doSendCardInfo", "Entrou");
-		AsyncTask<Integer, Void, Boolean> sendCardInfo = new AsyncTask<Integer, Void, Boolean>() {
-			
-			@Override
-			protected void onPreExecute() 
-			{
-				if (!startedRound)
-				{
-					verifyWinner();
-				}
-				super.onPreExecute();
-			}
-			
+		AsyncTask<Integer, Void, Boolean> sendInfo = new AsyncTask<Integer, Void, Boolean>() 
+		{
 			@Override
 			protected Boolean doInBackground(Integer... params) 
 			{
-				/*
-				 * Envia:
-				 * Index da carta jogada pelo host
-				 */
 				try 
 				{
 					BluetoothHelper.getBtSocket().getOutputStream().write((params[0].toString() + ",").getBytes());
@@ -442,28 +599,48 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				}
 				else
 				{
-					if (startedRound)
-						doReceiveCardInfo();
+					if (sendCode == 0 || sendCode == 1 || sendCode == 2) // No envio de cartas eh necessario fazer a verificacao abaixo
+					{
+						if (startedRound)
+							doReceiveInfo(); // Se o host comeca o round, deve-se esperar pela carta ou pedido de truco do cliente
+						else
+							verifyWinner(); // Se o host termina o round, apos o envio da sua carta deve-se calcular o resultado
+					}
+					else // No envio de pedidos de truco e afins so eh necessario verificar se o host correu
+					{
+						if (sendCode == 8) // Correu do pedido de truco
+						{
+							manager.player2MatchScore += manager.gameValue;
+							p2MatchScore.setText(String.valueOf(manager.player2MatchScore));
+							newGame();
+						}
+						else
+							doReceiveInfo();
+					}
 				}
 			}
 		};
 		
-		sendCardInfo.execute(cardIndex);
+		sendInfo.execute(sendCode);
 	}
 	
-	private void doReceiveCardInfo()
+	private void doReceiveInfo()
 	{
+		/*
+		 * Dados que podem ser recebidos:
+		 * 0,1,2: referentes a posicao da carta jogada pelo cliente no vetor handPlayer2 do manager
+		 * 7: pedido de truco
+		 * 8: recusa do pedido de truco ou de aumento da aposta do host
+		 * 9: aceitação do pedido de truco ou de aumento da aposta do host
+		 * 10: aumento da aposta
+		 */
 		Log.i("doReceiveCardInfo", "Entrou");
-		AsyncTask<Void, Void, byte[]> receiveCardInfo = new AsyncTask<Void, Void, byte[]>() {
+		AsyncTask<Void, Void, byte[]> receiveInfo = new AsyncTask<Void, Void, byte[]>() {
 			
 			@Override
 			protected byte[] doInBackground(Void... params) 
 			{
-				/*
-				 * Recebe:
-				 * Index da carta jogada pelo cliente
-				 */
-				byte[] buffer = new byte[128];
+				byte[] buffer = new byte[32];
 				try 
 				{
 					BluetoothHelper.getBtSocket().getInputStream().read(buffer);
@@ -488,12 +665,13 @@ public class HostGameActivity extends Activity implements OnClickListener{
 				} 
 				else // Sucesso
 				{
+					int codeReceived = -1;
+					
 					try 
 					{
 						String temp = new String(result, "UTF-8");
-						String[] cardIndex = temp.split(",");
-						clientCardIndex = Integer.parseInt(cardIndex[0]);
-						setOpponentPlayingCard();
+						String[] code = temp.split(",");
+						codeReceived = Integer.parseInt(code[0]);
 					} 
 					catch (UnsupportedEncodingException e) 
 					{
@@ -503,16 +681,102 @@ public class HostGameActivity extends Activity implements OnClickListener{
 						finish();
 					}
 					
-					if (startedRound)
+					if (codeReceived == 0 || codeReceived == 1 || codeReceived == 2) // Recebimento de cartas
 					{
-						verifyWinner();
+						clientCardIndex = codeReceived;
+						setOpponentPlayingCard();
+							
+						if (startedRound)
+						{
+							verifyWinner();
+						}
+						else
+							manager.playerTurn = 1;
 					}
-					else
-						manager.playerTurn = 1;
+					else // Recebimento de pedidos de truco e afins
+					{
+						if (codeReceived == 7) // Pedido de truco do cliente
+						{
+							trucoAlert.setTitle("Truco!");
+							trucoAlert.show();
+							manager.playerTurn = 1;
+						}
+						else if (codeReceived == 8) // Cliente correu do pedido de truco ou de aumento da aposta feita pelo host
+						{
+							manager.player1MatchScore += manager.gameValue;
+							p1MatchScore.setText(String.valueOf(manager.player1MatchScore));
+							newGame();
+						}
+						else if (codeReceived == 9) // Cliente aceitou o pedido de truco
+						{
+							if (manager.gameValue == 3)
+								genericAlert.setTitle("Três");
+							else if (manager.gameValue == 9)
+								genericAlert.setTitle("Nove");
+							
+							genericAlert.setMessage("O Adversário Aceitou o Pedido de Truco.");
+							genericAlert.show();
+							manager.playerTurn = 1;
+						}
+						else if (codeReceived == 10) // Cliente aumentou a aposta
+						{
+							manager.increaseGameValue();
+							
+							if (manager.gameValue == 6)
+							{
+								trucoAlert.setTitle("Seis!");
+								trucoAlert.show();
+							}
+							else if (manager.gameValue == 12)
+							{
+								genericAlert.setTitle("Doze!");
+								genericAlert.setMessage("");
+								genericAlert.show();
+							}
+							
+							manager.playerTurn = 1;
+						}
+					}
 				}
 			}
 		};
 		
-		receiveCardInfo.execute();
+		receiveInfo.execute();
+	}
+	
+	private void doWaitAndFinish()
+	{
+		AsyncTask<Void, Void, Void> waitAndFinish = new AsyncTask<Void, Void, Void>() 
+		{
+			@Override
+			protected void onPreExecute() 
+			{
+				super.onPreExecute();
+				
+			}
+			
+			@Override
+			protected Void doInBackground(Void... params) 
+			{
+				try 
+				{
+					Thread.sleep(3000);
+				} 
+				catch (InterruptedException e) 
+				{
+					Log.i(getClass().getName(), e.getMessage().toString());
+				}
+				return null;
+			}
+			
+			@Override
+			protected void onPostExecute(Void result) 
+			{
+				super.onPostExecute(result);
+				finish();
+			}
+		};
+		
+		waitAndFinish.execute();
 	}
 }
