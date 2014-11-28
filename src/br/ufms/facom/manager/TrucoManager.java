@@ -2,8 +2,6 @@ package br.ufms.facom.manager;
 
 import java.util.Random;
 
-import android.util.Log;
-
 public class TrucoManager {
 	
 	public static final String P1_WINNER = "P1WIN";
@@ -113,11 +111,15 @@ public class TrucoManager {
 			if (secondRoundResult == ROUND_P1_WINNER)
 			{
 				player1MatchScore += gameValue;
+				if (player1MatchScore > 12)
+					player1MatchScore = 12;
 				return GAME_P1_WINNER;
 			}
 			else if (secondRoundResult == ROUND_P2_WINNER)
 			{
 				player2MatchScore += gameValue;
+				if (player2MatchScore > 12)
+					player2MatchScore = 12;
 				return GAME_P2_WINNER;
 			}
 		}
@@ -127,11 +129,15 @@ public class TrucoManager {
 			if (firstRoundResult == ROUND_P1_WINNER)
 			{
 				player1MatchScore += gameValue;
+				if (player1MatchScore > 12)
+					player1MatchScore = 12;
 				return GAME_P1_WINNER;
 			}
 			else if (firstRoundResult == ROUND_P2_WINNER)
 			{
 				player2MatchScore += gameValue;
+				if (player2MatchScore > 12)
+					player2MatchScore = 12;
 				return GAME_P2_WINNER;
 			}
 		}
@@ -140,11 +146,15 @@ public class TrucoManager {
 		if (firstRoundResult == ROUND_P1_WINNER && secondRoundResult == ROUND_P1_WINNER)
 		{
 			player1MatchScore += gameValue;
+			if (player1MatchScore > 12)
+				player1MatchScore = 12;
 			return GAME_P1_WINNER;
 		}
 		else if (firstRoundResult == ROUND_P2_WINNER && secondRoundResult == ROUND_P2_WINNER)
 		{
 			player2MatchScore += gameValue;
+			if (player2MatchScore > 12)
+				player2MatchScore = 12;
 			return GAME_P2_WINNER;
 		}
 		
@@ -161,14 +171,16 @@ public class TrucoManager {
 		 */
 		if (thirdRoundResult == ROUND_P1_WINNER)
 		{
-			Log.i("match1", "Entrou");
 			player1MatchScore += gameValue;
+			if (player1MatchScore > 12)
+				player1MatchScore = 12;
 			return GAME_P1_WINNER;
 		}
 		else if (thirdRoundResult == ROUND_P2_WINNER)
 		{
-			Log.i("match1", "Entrou2");
 			player2MatchScore += gameValue;
+			if (player2MatchScore > 12)
+				player2MatchScore = 12;
 			return GAME_P2_WINNER;
 		}
 		
@@ -275,7 +287,7 @@ public class TrucoManager {
 	{
 		String[] temp = initialInfo.split(",");
 		
-		this.gameValue = 1;		
+		this.gameValue = 1;	
 		this.player1GameScore = 0;
 		this.player1GameScore = 0;
 		this.playerTurn = Integer.parseInt(temp[0]);

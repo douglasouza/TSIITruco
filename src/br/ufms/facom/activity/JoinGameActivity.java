@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
@@ -103,11 +103,10 @@ public class JoinGameActivity extends Activity {
 			{
 				final BluetoothDevice btDevice = btDeviceList.get(position);
 				
-				ProgressDialog.Builder waitDialog = new Builder(JoinGameActivity.this);
+				Builder waitDialog = new Builder(JoinGameActivity.this);
 				waitDialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
-				waitDialog.setCancelable(false);
 				waitDialog.setTitle("Aguarde...");
-				waitDialog.show();
+				final AlertDialog alert = waitDialog.show();
 				
 				AsyncTask<Void, Void, Boolean> connectTask = new AsyncTask<Void, Void, Boolean>()
 				{
@@ -135,6 +134,7 @@ public class JoinGameActivity extends Activity {
 						super.onPostExecute(result);
 						if (result == true)
 						{
+							alert.dismiss();
 							BluetoothHelper.getBtAdapter().cancelDiscovery();
 							Intent clientGameIntent = new Intent(JoinGameActivity.this, ClientGameActivity.class);
 							startActivity(clientGameIntent);

@@ -83,6 +83,10 @@ public class LobbyActivity extends Activity {
 				protected void onPostExecute(Boolean result) {
 					super.onPostExecute(result);
 					
+					txtDeviceName.clearAnimation();
+					txtOpponentDeviceName.clearAnimation();
+					txtWaitingPlayer.clearAnimation();
+					
 					if (result == true)
 					{
 						Intent hostGameIntent = new Intent(LobbyActivity.this, HostGameActivity.class);

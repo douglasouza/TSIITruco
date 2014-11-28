@@ -16,5 +16,7 @@
     <string name="waiting_invite">Esperando Convite</string>
     <string name="title_activity_host_game">HostGameActivity</string>
     <string name="title_activity_client_game">ClientGameActivity</string>
+    
+    <color name="yellow">#EEEE00</color>
 
 </resources>

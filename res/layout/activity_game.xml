@@ -171,4 +171,31 @@
             android:textSize="32sp" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/imageViewYourTurn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/imageViewPlayingCard"
+        android:layout_marginBottom="17dp"
+        android:layout_toRightOf="@+id/imageViewOpponentCard2"
+        android:src="@drawable/your_turn" />
+
+    <ImageView
+        android:id="@+id/imageViewOpponentTurn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignTop="@+id/imageViewOpponentCard3"
+        android:layout_toRightOf="@+id/imageViewYourTurn"
+        android:src="@drawable/opponent_turn" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageViewVira"
+        android:layout_alignRight="@+id/imageViewVira"
+        android:layout_below="@+id/imageViewVira"
+        android:gravity="center_horizontal"
+        android:text="Vira"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
 </RelativeLayout>

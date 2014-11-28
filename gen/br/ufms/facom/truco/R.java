@@ -10,6 +10,9 @@ package br.ufms.facom.truco;
 public final class R {
     public static final class attr {
     }
+    public static final class color {
+        public static final int yellow=0x7f060000;
+    }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
 
@@ -47,53 +50,57 @@ public final class R {
         public static final int king_of_diamonds=0x7f020016;
         public static final int king_of_hearts=0x7f020017;
         public static final int king_of_spades=0x7f020018;
-        public static final int queen_of_clubs=0x7f020019;
-        public static final int queen_of_diamonds=0x7f02001a;
-        public static final int queen_of_hearts=0x7f02001b;
-        public static final int queen_of_spades=0x7f02001c;
-        public static final int seven_of_clubs=0x7f02001d;
-        public static final int seven_of_diamonds=0x7f02001e;
-        public static final int seven_of_hearts=0x7f02001f;
-        public static final int seven_of_spades=0x7f020020;
-        public static final int six_of_clubs=0x7f020021;
-        public static final int six_of_diamonds=0x7f020022;
-        public static final int six_of_hearts=0x7f020023;
-        public static final int six_of_spades=0x7f020024;
-        public static final int suits=0x7f020025;
-        public static final int three_of_clubs=0x7f020026;
-        public static final int three_of_diamonds=0x7f020027;
-        public static final int three_of_hearts=0x7f020028;
-        public static final int three_of_spades=0x7f020029;
-        public static final int two_of_clubs=0x7f02002a;
-        public static final int two_of_diamonds=0x7f02002b;
-        public static final int two_of_hearts=0x7f02002c;
-        public static final int two_of_spades=0x7f02002d;
+        public static final int opponent_turn=0x7f020019;
+        public static final int queen_of_clubs=0x7f02001a;
+        public static final int queen_of_diamonds=0x7f02001b;
+        public static final int queen_of_hearts=0x7f02001c;
+        public static final int queen_of_spades=0x7f02001d;
+        public static final int seven_of_clubs=0x7f02001e;
+        public static final int seven_of_diamonds=0x7f02001f;
+        public static final int seven_of_hearts=0x7f020020;
+        public static final int seven_of_spades=0x7f020021;
+        public static final int six_of_clubs=0x7f020022;
+        public static final int six_of_diamonds=0x7f020023;
+        public static final int six_of_hearts=0x7f020024;
+        public static final int six_of_spades=0x7f020025;
+        public static final int suits=0x7f020026;
+        public static final int three_of_clubs=0x7f020027;
+        public static final int three_of_diamonds=0x7f020028;
+        public static final int three_of_hearts=0x7f020029;
+        public static final int three_of_spades=0x7f02002a;
+        public static final int two_of_clubs=0x7f02002b;
+        public static final int two_of_diamonds=0x7f02002c;
+        public static final int two_of_hearts=0x7f02002d;
+        public static final int two_of_spades=0x7f02002e;
+        public static final int your_turn=0x7f02002f;
     }
     public static final class id {
-        public static final int btnCreateGame=0x7f070016;
-        public static final int btnFindGame=0x7f070017;
-        public static final int btnTruco=0x7f07000d;
-        public static final int imageViewCard1=0x7f070003;
-        public static final int imageViewCard2=0x7f070006;
-        public static final int imageViewCard3=0x7f070007;
-        public static final int imageViewOpponentCard1=0x7f070000;
-        public static final int imageViewOpponentCard2=0x7f070001;
-        public static final int imageViewOpponentCard3=0x7f070002;
-        public static final int imageViewOpponentPlayingCard=0x7f070005;
-        public static final int imageViewPlayingCard=0x7f070009;
-        public static final int imageViewSuits=0x7f070015;
-        public static final int imageViewVira=0x7f070004;
-        public static final int linearLayout1=0x7f07000a;
-        public static final int list=0x7f070011;
-        public static final int textView3=0x7f070008;
-        public static final int txtDeviceName=0x7f070013;
-        public static final int txtOpponentDeviceName=0x7f070014;
-        public static final int txtSearchingDevices=0x7f070010;
-        public static final int txtViewPlayer1GameScore=0x7f07000e;
-        public static final int txtViewPlayer1MatchScore=0x7f07000b;
-        public static final int txtViewPlayer2GameScore=0x7f07000f;
-        public static final int txtViewPlayer2MatchScore=0x7f07000c;
-        public static final int txtWaitingPlayer=0x7f070012;
+        public static final int btnCreateGame=0x7f080018;
+        public static final int btnFindGame=0x7f080019;
+        public static final int btnTruco=0x7f08000d;
+        public static final int imageViewCard1=0x7f080003;
+        public static final int imageViewCard2=0x7f080006;
+        public static final int imageViewCard3=0x7f080007;
+        public static final int imageViewOpponentCard1=0x7f080000;
+        public static final int imageViewOpponentCard2=0x7f080001;
+        public static final int imageViewOpponentCard3=0x7f080002;
+        public static final int imageViewOpponentPlayingCard=0x7f080005;
+        public static final int imageViewOpponentTurn=0x7f080011;
+        public static final int imageViewPlayingCard=0x7f080009;
+        public static final int imageViewSuits=0x7f080017;
+        public static final int imageViewVira=0x7f080004;
+        public static final int imageViewYourTurn=0x7f080010;
+        public static final int linearLayout1=0x7f08000a;
+        public static final int list=0x7f080013;
+        public static final int textView3=0x7f080008;
+        public static final int txtDeviceName=0x7f080015;
+        public static final int txtOpponentDeviceName=0x7f080016;
+        public static final int txtSearchingDevices=0x7f080012;
+        public static final int txtViewPlayer1GameScore=0x7f08000e;
+        public static final int txtViewPlayer1MatchScore=0x7f08000b;
+        public static final int txtViewPlayer2GameScore=0x7f08000f;
+        public static final int txtViewPlayer2MatchScore=0x7f08000c;
+        public static final int txtWaitingPlayer=0x7f080014;
     }
     public static final class layout {
         public static final int activity_game=0x7f030000;
@@ -141,11 +148,11 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f060000;
+        public static final int AppBaseTheme=0x7f070000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f060001;
-        public static final int btnStyle=0x7f060002;
+        public static final int AppTheme=0x7f070001;
+        public static final int btnStyle=0x7f070002;
     }
 }
