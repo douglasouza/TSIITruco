@@ -71,11 +71,18 @@ public class TrucoManager {
 		player1GameScore = 0;
 		player2GameScore = 0;
 		
-		for(int i = 0; i < 3; i++)
-		{
-			handPlayer1[i] = deck.removeCard();
-			handPlayer2[i] = deck.removeCard();	
-		}
+//		for(int i = 0; i < 3; i++)
+//		{
+//			handPlayer1[i] = deck.removeCard();
+//			handPlayer2[i] = deck.removeCard();	
+//		}
+		
+		handPlayer1[0] = new Card(Suit.clubs, CardValue.three);
+		handPlayer2[0] = new Card(Suit.diamonds, CardValue.three);
+		handPlayer1[1] = new Card(Suit.clubs, CardValue.two);
+		handPlayer2[1] = new Card(Suit.diamonds, CardValue.three);
+		handPlayer1[2] = new Card(Suit.clubs, CardValue.six);
+		handPlayer2[2] = new Card(Suit.diamonds, CardValue.five);
 
 		vira = deck.removeCard();
 		
@@ -182,6 +189,23 @@ public class TrucoManager {
 			if (player2MatchScore > 12)
 				player2MatchScore = 12;
 			return GAME_P2_WINNER;
+		}
+		else if (thirdRoundResult == ROUND_DRAW)
+		{
+			if (firstRoundResult == ROUND_P1_WINNER)
+			{
+				player1MatchScore += gameValue;
+				if (player1MatchScore > 12)
+					player1MatchScore = 12;
+				return GAME_P1_WINNER;
+			}
+			if (firstRoundResult == ROUND_P2_WINNER)
+			{
+				player2MatchScore += gameValue;
+				if (player1MatchScore > 12)
+					player1MatchScore = 12;
+				return GAME_P2_WINNER;
+			}
 		}
 		
 		return GAME_DRAW; // Três empates, ninguém ganha

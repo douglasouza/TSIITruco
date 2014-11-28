@@ -50,6 +50,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 	private TextView p2MatchScore;
 	private TrucoManager manager;
 	private Vibrator vibrator;
+	private boolean backPressed;
 	private boolean card1Used;
 	private boolean card2Used;
 	private boolean card3Used;
@@ -108,6 +109,8 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 		card2.setOnClickListener(this);
 		card3.setOnClickListener(this);
 		
+		backPressed = false;
+		
 		winnerLoserAlert = new AlertDialog.Builder(ClientGameActivity.this);
 		winnerLoserAlert.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
 		winnerLoserAlert.setCancelable(false);
@@ -134,6 +137,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 			@Override
 			public void onClick(DialogInterface dialog, int which) 
 			{
+				backPressed = true;
 				BluetoothHelper.closeSocket();
 				matchDAO.close();
 				finish();
@@ -345,7 +349,6 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 			// Incremena o contador de rounds
 			roundCount++;
 			
-			turnUsed = false;
 			doWaitAndRefreshPlayingCards();
 			
 			// Se o host ganhou, entao ele comeca o prox round. Portanto deve-se esperar sua jogada
@@ -397,7 +400,6 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				// Se ainda nao existe vencedor, incrementa o contador de rounds
 				roundCount++;
 				
-				turnUsed = false;
 				doWaitAndRefreshPlayingCards();
 				
 				// Se o host ganhou, entao ele comeca o prox round. Portanto deve-se esperar sua jogada
@@ -720,7 +722,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 			@Override
 			protected void onPostExecute(Boolean result) {
 				super.onPostExecute(result);
-				if (result == false) // Falha
+				if (result == false && !backPressed) // Falha
 				{
 					Toast.makeText(ClientGameActivity.this, "Falha de conexão. Jogo encerrado!", Toast.LENGTH_LONG).show();
 					BluetoothHelper.closeSocket();
@@ -946,6 +948,7 @@ public class ClientGameActivity extends Activity implements OnClickListener{
 				int resourceId = getResources().getIdentifier("decks_back", "drawable", getPackageName());
 				playingCard.setImageDrawable(getResources().getDrawable(resourceId));
 				opponentPlayingCard.setImageDrawable(getResources().getDrawable(resourceId));
+				turnUsed = false;
 			}
 		};
 		
